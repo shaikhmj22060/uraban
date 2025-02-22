@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    <style>
+      /* Custom animation for loader */
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      #loader {
+        animation: fadeIn 0.2s ease-in-out;
+      }
+
+      /* Add some delay to hide the loader smoothly */
+      #loader.hidden {
+        animation: fadeOut 0.5s ease-in-out forwards;
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* Custom hover effect for cards */
+      .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Loader (initially visible while page loads) -->
+    <div
+      id="loader"
+      class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"
+    >
+      <div
+        class="w-16 h-16 border-4 border-t-transparent border-gray-200 rounded-full animate-spin"
+      ></div>
+    </div>
+    <script>
+      //Hide loader after page loads
+      window.onload = function () {
+        setTimeout(() => {
+          document.getElementById("loader").classList.add("hidden");
+          document.body.classList.remove("loading");
+        }, 500);
+      };
+    </script>
+    <!-- Header Section -->
+    <header class="bg-white shadow fixed w-full z-40">
+      <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-bold">
+          <div class="flex items-center">
+            <!-- Logo -->
+            <div class="bg-black text-white rounded-full p-3 mr-4">
+              <span class="text-xl font-bold">UC</span>
+            </div>
+            <h1 class="text-2xl font-semibold">Urban Company</h1>
+          </div>
+        </div>
+        <nav>
+          <ul class="flex space-x-6">
+            <li><a href="#" class="text-gray-600 hover:text-black hover:underline">Home</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black hover:underline">Services</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black hover:underline">About</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black hover:underline">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="flex items-center">
+          <div class="relative">
+            <img
+              id="avatarButton"
+              type="button"
+              data-dropdown-toggle="userDropdown"
+              data-dropdown-placement="bottom-start"
+              class="w-10 h-10 rounded-full cursor-pointer"
+              src="{% static 'MJ.jpg' %}"
+              alt="User dropdown"
+            />
+            <!-- Dropdown menu -->
+            <div
+              id="userDropdown"
+              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+            >
+              <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                <div>{{user.username}}</div>
+                <div class="font-medium truncate">{{user.email}}</div>
+              </div>
+              <div class="py-1">
+                <a
+                  href="{% url 'logout_user' %}"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                  >Sign out</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Add padding to the first section to account for the fixed header -->
+    <section class="pt-24 flex py-12 flex-col sm:flex-row">
+      <!-- Left Section - Modified for responsiveness -->
+      <div class="left w-full sm:w-[45%] pl-6 sm:pl-12">
+        <div class="title pb-4">
+          <h1 class="text-3xl sm:text-4xl font-medium w-full sm:w-[80%]">Home services at your doorstep</h1>
+        </div>
+        <div class="category mt-5 border border-[#e3e3e3] py-2 px-2 rounded-lg bg-[#FFFFFF] w-full sm:w-[80%] ">
+          <h3 class="px-4 sm:px-6 py-4 font-semibold text-lg sm:text-[20px] text-[#545454]">What are you looking for?</h3>
+          <div class="boxes my-2 flex flex-wrap justify-center items-center gap-4 cursor-pointer">
+            <!-- ... rest of your category content ... -->
+              <div class="flex group relative flex-col justify-center items-center">
+                <div class="content bg-[#F5F5F5] px-9 py-2 rounded-lg w-fit flex flex-col justify-center items-center">
+                  <img src="{% static 'face.png' %}" alt="Face" width="60" height="60">
+                  <p class="w-max">
+                    <span class="absolute -bottom-1 left-1/2 w-0 transition-all h-0.5 bg-black group-hover:w-2/6"></span>
+                    <span class="absolute -bottom-1 right-1/2 w-0 transition-all h-0.5 bg-black group-hover:w-2/6"></span>
+                  </p>
+                </div>
+                <div class="text-center">
+                  <span>Hover over me</span>
+                </div>
+              </div>
+              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
+                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
+                <h4 class="mt-2">womens salon</h4>
+              </div>
+              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
+                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
+                <h4 class="mt-2">womens salon</h4>
+              </div>
+              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
+                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
+                <h4 class="mt-2">womens salon</h4>
+              </div>
+              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
+                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
+                <h4 class="mt-2">womens salon</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Right Section - Hidden on mobile -->
+      <div class="right hidden sm:block w-[55%]">
+        <img src="{% static 'hero.jpeg' %}" alt="" class="w-[80%] h-[100%] object-cover rounded-lg">
+      </div>
+    </section>
+
+    <!-- Hero Section -->
+    <section class=" py-12">
+      <div class="container mx-auto px-6">
+        <h1 class="text-4xl font-bold mb-6">Home services at your doorstep</h1>
+        <div class="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
+          <div class="card  p-4 rounded-lg">
+            <img
+              src="{% static 'MJ.jpg' %}"
+              alt="Salon at home service"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h2 class="text-lg font-semibold">Salon at home</h2>
+            <p class="text-gray-500">Relax and rejuvenate</p>
+          </div>
+          <div class="card bg-white p-4 rounded-lg">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Electricians service"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h2 class="text-lg font-semibold">Electricians</h2>
+            <p class="text-gray-500">Expert solutions</p>
+          </div>
+          <div class="card bg-white p-4 rounded-lg">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Plumbers service"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h2 class="text-lg font-semibold">Plumbers</h2>
+            <p class="text-gray-500">Fix your issues</p>
+          </div>
+          <div class="card bg-white p-4 rounded-lg">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Cleaning service"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h2 class="text-lg font-semibold">Cleaning</h2>
+            <p class="text-gray-500">Sparkling spaces</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- New and Noteworthy Section -->
+    <section class="py-12">
+      <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold mb-6">New and Noteworthy</h2>
+        <div class="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div class="card  p-4 rounded-lg">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Service 1"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h3 class="text-lg font-semibold">Service Name 1</h3>
+            <p class="text-gray-500">Description of the service</p>
+          </div>
+          <div class="card bg-white p-4 rounded-lg">
+            <img
+              src="https://via.placeholder.com/150"
+              alt=" Service 2"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h3 class="text-lg font-semibold">Service Name 2</h3>
+            <p class="text-gray-500">Description of the service</p>
+          </div>
+          <div class="card bg-white p-4 rounded-lg">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Service 3"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h3 class="text-lg font-semibold">Service Name 3</h3>
+            <p class="text-gray-500">Description of the service</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Most Booked Services Section -->
+    <section class="bg-gray-100 py-12">
+      <div class="container mx-auto px-6">
+        <h1 class="text-4xl font-bold mb-6">Popular Services</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="card bg-white p-4 rounded-lg">
+            <img
+              src="{% static 'MJ.jpg' %}"
+              alt="Salon at Home service"
+              class="w-full h-40 object-cover rounded mb-4"
+              loading="lazy"
+            />
+            <h2 class="text-lg font-semibold">Salon at Home</h2>
+            <p class="text-gray-500">Relax and rejuvenate</p>
+            <a href="#" class="mt-4 inline-block bg-black text-white px-4 py-2 rounded-lg">Book Now</a>
+          </div>
+          <!-- Add more service cards here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-white py-6">
+      <div class="container mx-auto px-6 text-center">
+        <p class="text-gray-500">
+          &copy; 2025 Your Company. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

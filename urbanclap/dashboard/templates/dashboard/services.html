@@ -1,0 +1,170 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Main Container -->
+<div class="flex flex-col space-y-6 p-6 bg-gray-200 min-h-screen">
+
+    <!-- Services Section -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden flex-1 flex flex-col">
+        <div class="p-4 border-b border-b-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Services</h3>
+            <!-- Add Service Button -->
+            <button data-modal-target="addServiceModal" data-modal-toggle="addServiceModal" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">
+                Add Service
+            </button>
+        </div>
+        <div class="overflow-y-auto flex-1">
+            <table class="w-full text-sm text-left text-gray-900">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-center">Service Name</th>
+                        <th scope="col" class="px-6 py-3 text-center">Subcategory</th>
+                        <th scope="col" class="px-6 py-3 text-center">Image</th>
+                        <th scope="col" class="px-6 py-3 text-center">Price</th>
+                        <th scope="col" class="px-6 py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900 text-center">{{ service.name }}</td>
+                        <td class="px-6 py-4 text-center">{{ service.subcatagory.name }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}" class="w-20 h-20 object-cover rounded-lg shadow-sm mx-auto">
+                        </td>
+                        <td class="px-6 py-4 text-center">${{ service.price }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex justify-center space-x-2">
+                                <!-- Edit Button -->
+                                <button data-modal-toggle="editServiceModal{{ service.id }}" type="button" class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 font-medium rounded-md text-sm px-3 py-2">
+                                    Edit
+                                </button>
+                                <!-- Delete Button -->
+                                <a href="{% url 'deleteservice' service.id %}">
+                                    <button type="button" class="text-white bg-rose-500 hover:bg-rose-600 focus:ring-4 focus:ring-rose-300 font-medium rounded-md text-sm px-3 py-2">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Service Modal -->
+                    <div id="editServiceModal{{ service.id }}" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative w-full max-w-md max-h-full">
+                            <div class="relative bg-white rounded-lg shadow">
+                                <!-- Modal Header -->
+                                <div class="flex items-center justify-between p-4 border-b rounded-t">
+                                    <h3 class="text-lg font-semibold text-gray-900">Edit Service</h3>
+                                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="editServiceModal{{ service.id }}">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="p-4">
+                                    <form method="post" action="{% url 'editservice' service.id %}" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="mb-4">
+                                            <label for="serviceName{{ service.id }}" class="block text-sm font-medium text-gray-900">Service Name</label>
+                                            <input type="text" id="serviceName{{ service.id }}" name="name" class="mt-1 p-2 w-full border rounded-md" value="{{ service.name }}" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="subcategory{{ service.id }}" class="block text-sm font-medium text-gray-900">Subcategory</label>
+                                            <select id="subcategory{{ service.id }}" name="subcatagory" class="mt-1 p-2 w-full border rounded-md" required>
+                                                {% for sub in subcategories %}
+                                                <option value="{{ sub.id }}" {% if sub.id == service.subcatagory.id %}selected{% endif %}>{{ sub.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="serviceImage{{ service.id }}" class="block text-sm font-medium text-gray-900">Service Image</label>
+                                            <input type="file" id="serviceImage{{ service.id }}" name="image" class="mt-1 p-2 w-full border rounded-md">
+                                            <p class="text-sm text-gray-500 mt-1">Current Image: <a href="{{ service.image.url }}" target="_blank" class="text-blue-500 hover:underline">{{ service.image.name }}</a></p>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="price{{ service.id }}" class="block text-sm font-medium text-gray-900">Price</label>
+                                            <input type="number" id="price{{ service.id }}" name="price" class="mt-1 p-2 w-full border rounded-md" value="{{ service.price }}" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="description{{ service.id }}" class="block text-sm font-medium text-gray-900">Description</label>
+                                            <textarea id="description{{ service.id }}" name="description" class="mt-1 p-2 w-full border rounded-md" rows="4">{{ service.description }}</textarea>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            No services found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Service Modal -->
+<div id="addServiceModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+                <h3 class="text-lg font-semibold text-gray-900">Add Service</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="addServiceModal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-4">
+                <form action="{% url 'createservice' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="serviceName" class="block text-sm font-medium text-gray-900">Service Name</label>
+                        <input type="text" name="name" id="serviceName" class="mt-1 p-2 w-full border rounded-md" placeholder="Enter service name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="subcategory" class="block text-sm font-medium text-gray-900">Subcategory</label>
+                        <select id="subcategory" name="subcatagory" class="mt-1 p-2 w-full border rounded-md" required>
+                            {% for sub in subcategories %}
+                            <option value="{{ sub.id }}">{{ sub.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="serviceImage" class="block text-sm font-medium text-gray-900">Service Image</label>
+                        <input type="file" name="image" id="serviceImage" class="mt-1 p-2 w-full border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="price" class="block text-sm font-medium text-gray-900">Price</label>
+                        <input type="number" name="price" id="price" class="mt-1 p-2 w-full border rounded-md" placeholder="Enter price" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="description" class="block text-sm font-medium text-gray-900">Description</label>
+                        <textarea id="description" name="description" class="mt-1 p-2 w-full border rounded-md" rows="4" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flowbite Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+{% endblock %}

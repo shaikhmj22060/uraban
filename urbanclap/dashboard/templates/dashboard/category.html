@@ -1,0 +1,276 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Main Container -->
+<div class="flex flex-col space-y-6 p-6 bg-gray-200 min-h-screen">
+
+    <!-- Categories Section -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-4 border-b border-b-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Categories</h3>
+            <!-- Add Category Button -->
+            <button data-modal-target="addCategoryModal" data-modal-toggle="addCategoryModal" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">
+                Add Category
+            </button>
+        </div>
+        <div class="overflow-y-auto max-h-96">
+            <table class="w-full text-sm text-left text-gray-900">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-center">Category Name</th>
+                        <th scope="col" class="px-6 py-3 text-center">Image</th>
+                        <th scope="col" class="px-6 py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in data %}
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900 text-center">{{ i.name }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <img src="{{ i.image.url }}" alt="{{ i.name }}" class="w-20 h-20 object-cover rounded-lg shadow-sm mx-auto">
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex justify-center space-x-2">
+                                <!-- Edit Button -->
+                                <button data-modal-toggle="editCategoryModal{{ i.id }}" type="button" class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 font-medium rounded-md text-sm px-3 py-2">
+                                    Edit
+                                </button>
+                                <!-- Delete Button -->
+                                <a href="{% url 'deletecat' i.id %}">
+                                    <button type="button" class="text-white bg-rose-500 hover:bg-rose-600 focus:ring-4 focus:ring-rose-300 font-medium rounded-md text-sm px-3 py-2">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Category Modal -->
+                    <div id="editCategoryModal{{ i.id }}" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative w-full max-w-md max-h-full">
+                            <div class="relative bg-white rounded-lg shadow">
+                                <!-- Modal Header -->
+                                <div class="flex items-center justify-between p-4 border-b rounded-t">
+                                    <h3 class="text-lg font-semibold text-gray-900">Edit Category</h3>
+                                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="editCategoryModal{{ i.id }}">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="p-4">
+                                    <form method="post" action="{% url 'edit_category' i.id %}" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="mb-4">
+                                            <label for="categoryName{{ i.id }}" class="block text-sm font-medium text-gray-900">Category Name</label>
+                                            <input type="text" id="categoryName{{ i.id }}" name="name" class="mt-1 p-2 w-full border rounded-md" value="{{ i.name }}" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="categoryImage{{ i.id }}" class="block text-sm font-medium text-gray-900">Category Image</label>
+                                            <input type="file" id="categoryImage{{ i.id }}" name="image" class="mt-1 p-2 w-full border rounded-md">
+                                            <p class="text-sm text-gray-500 mt-1">Current Image: <a href="{{ i.image.url }}" target="_blank" class="text-blue-500 hover:underline">{{ i.image.name }}</a></p>
+
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <!-- If no data is available -->
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                            No categories found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Subcategories Section -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-4 border-b border-b-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Subcategories</h3>
+            <!-- Add Subcategory Button -->
+            <button data-modal-target="addSubCategoryModal" data-modal-toggle="addSubCategoryModal" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">
+                Add Subcategory
+            </button>
+        </div>
+        <div class="overflow-y-auto max-h-96">
+            <table class="w-full text-sm text-left text-gray-900">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-center">Subcategory Name</th>
+                        <th scope="col" class="px-6 py-3 text-center">Associated Category</th>
+                        <th scope="col" class="px-6 py-3 text-center">Image</th> <!-- New Column -->
+                        <th scope="col" class="px-6 py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in sub_data %}
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900 text-center">{{ sub.name }}</td>
+                        <td class="px-6 py-4 text-center">{{ sub.category.name }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <img src="{{ sub.image.url }}" alt="{{ sub.name }}" class="w-20 h-20 object-cover rounded-lg shadow-sm mx-auto">
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex justify-center space-x-2">
+                                <!-- Edit Button -->
+                                <button data-modal-toggle="editSubCategoryModal{{ sub.id }}" type="button" class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 font-medium rounded-md text-sm px-3 py-2">
+                                    Edit
+                                </button>
+                                <!-- Delete Button -->
+                                <a href="{% url 'deletesubcat' sub.id %}">
+                                    <button type="button" class="text-white bg-rose-500 hover:bg-rose-600 focus:ring-4 focus:ring-rose-300 font-medium rounded-md text-sm px-3 py-2">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Subcategory Modal -->
+                    <div id="editSubCategoryModal{{ sub.id }}" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative w-full max-w-md max-h-full">
+                            <div class="relative bg-white rounded-lg shadow">
+                                <!-- Modal Header -->
+                                <div class="flex items-center justify-between p-4 border-b rounded-t">
+                                    <h3 class="text-lg font-semibold text-gray-900">Edit Subcategory</h3>
+                                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="editSubCategoryModal{{ sub.id }}">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="p-4">
+                                    <form method="post" action="{% url 'editsubcat' sub.id %}" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="mb-4">
+                                            <label for="subCategoryName" class="block text-sm font-medium text-gray-900">Subcategory Name</label>
+                                            <input type="text" id="subCategoryName{{ sub.id }}" name="name" class="mt-1 p-2 w-full border rounded-md" value="{{ sub.name }}" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="associatedCategory" class="block text-sm font-medium text-gray-900">Associated Category</label>
+                                            <select id="associatedCategory{{ sub.id }}" name="category" class="mt-1 p-2 w-full border rounded-md" required>
+                                                {% for cat in data %}
+                                                <option value="{{ cat.id }}" {% if cat.id == sub.category.id %}selected{% endif %}>{{ cat.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="subCategoryImage{{ sub.id }}" class="block text-sm font-medium text-gray-900">Subcategory Image</label>
+                                            <input type="file" id="subCategoryImage{{ sub.id }}" name="image" class="mt-1 p-2 w-full border rounded-md">
+                                            <p class="text-sm text-gray-500 mt-1">Current Image: <a href="{{ sub.image.url }}" target="_blank" class="text-blue-500 hover:underline">{{ sub.image.name }}</a></p>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <!-- If no data is available -->
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                            No subcategories found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div id="addCategoryModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+                <h3 class="text-lg font-semibold text-gray-900">Add Category</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="addCategoryModal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-4">
+                <form action="{% url 'createcat' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="categoryName" class="block text-sm font-medium text-gray-900">Category Name</label>
+                        <input type="text" name="name" id="categoryName" class="mt-1 p-2 w-full border rounded-md" placeholder="Enter category name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="categoryImage" class="block text-sm font-medium text-gray-900">Category Image</label>
+                        <input type="file" name="image" id="categoryImage" class="mt-1 p-2 w-full border rounded-md" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Subcategory Modal -->
+<div id="addSubCategoryModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+                <h3 class="text-lg font-semibold text-gray-900">Add Subcategory</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="addSubCategoryModal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-4">
+                <form action="{% url 'createsubcat' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="subCategoryName" class="block text-sm font-medium text-gray-900">Subcategory Name</label>
+                        <input type="text" name="name" id="subCategoryName" class="mt-1 p-2 w-full border rounded-md" placeholder="Enter subcategory name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="associatedCategory" class="block text-sm font-medium text-gray-900">Associated Category</label>
+                        <select id="associatedCategory" name="category" class="mt-1 p-2 w-full border rounded-md" required>
+                            {% for cat in data %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="subCategoryImage" class="block text-sm font-medium text-gray-900">Subcategory Image</label>
+                        <input type="file" name="image" id="subCategoryImage" class="mt-1 p-2 w-full border rounded-md" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 text-white bg-[#f84525] hover:bg-[#d63a1f] rounded-md">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flowbite Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+{% endblock %}

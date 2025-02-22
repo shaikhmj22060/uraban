@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+ {% block content %}
+  {% load static %}
+
+<style>
+  .fade-out {
+    animation: fadeOut 1s forwards;
+  }
+
+  @keyframes fadeOut {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .shake {
+    animation: shake 0.5s;
+  }
+
+  @keyframes shake {
+    0% {
+      transform: translate(1px, 0);
+    }
+    25% {
+      transform: translate(-1px, 0);
+    }
+    50% {
+      transform: translate(1px, 0);
+    }
+    75% {
+      transform: translate(-1px, 0);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+</style>
+
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+  <div class="mx-auto">
+    <div
+      class="bg-white shadow-lg h-full rounded-lg grid lg:grid-cols-2 overflow-hidden w-full lg:h-full mx-auto"
+    >
+      <!-- Left Section -->
+      <div class="p-10 flex flex-col justify-center">
+        <div class="flex items-center mb-6">
+          <!-- Logo -->
+          <div class="bg-black text-white rounded-full p-3 mr-4">
+            <span class="text-xl font-bold">UC</span>
+          </div>
+          <h1 class="text-2xl font-semibold">Urban Company</h1>
+        </div>
+        <h2 class="text-xl font-bold mb-4">Login</h2>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- Phone Number Input -->
+          <div class="flex items-center w-3/5 mb-4">
+            <input
+              type="text"
+              placeholder="Enter Email"
+              name="email"
+              class="w-full border border-gray-300 rounded-r-md px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              required
+            />
+          </div>
+          <div class="flex items-center w-3/5 mb-4">
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter Password"
+              class="w-full border border-gray-300 rounded-r-md px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              required
+            />
+          </div>
+          <!-- Login Button -->
+          <button
+            type="submit"
+            class="w-3/5 py-2 bg-purple-600 text-white rounded-md text-sm font-semibold hover:bg-purple-700 transition"
+          >
+            Submit
+          </button>
+          <!-- Help Text -->
+          <p class="text-sm text-gray-500 mt-2">
+            Forgot Password? <a href="#" class="text-purple-600">Reset Here</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Right Section -->
+      <div class="bg-gray-50 flex">
+        <div class="">
+          <img
+            src="{% static 'image.jpg' %}"
+            alt="AC Repairing Image"
+            class="shadow-md max-h-min"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if error_message %}
+  <div
+    id="toast-top-right"
+    class="fixed flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow top-5 right-5 dark:text-gray-400 dark:divide-gray-700 dark:bg-gray-800 shake"
+    role="alert"
+  >
+    <div class="text-sm font-normal">{{error_message}}</div>
+  </div>
+  <script>
+    setTimeout(() => {
+      const toast = document.getElementById("toast-top-right");
+      if (toast) {
+        toast.classList.add("fade-out");
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 1000); // Wait for the fade-out animation to complete
+      }
+    }, 4000); // 4 seconds
+  </script>
+  {% endif %}
+</body>
+
+{% endblock %}
