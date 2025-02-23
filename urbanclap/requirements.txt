@@ -1,13 +1,4 @@
 Django==5.1.4
 tailwind
 django-browser-reload
-tailwindcss
-@tailwindcss/aspect-ratio
-@tailwindcss/forms
-@tailwindcss/typography
-cross-env
-postcss
-postcss-import
-postcss-nested
-postcss-simple-vars
-rimraf
+pillow
