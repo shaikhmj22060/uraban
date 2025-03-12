@@ -76,6 +76,7 @@
       <div
         class="container mx-auto px-6 py-4 flex justify-between items-center"
       >
+      <a href="{% url 'wire' %}">
         <div class="text-xl font-bold">
           <div class="flex items-center">
             <!-- Logo -->
@@ -85,7 +86,8 @@
             <h1 class="text-2xl font-semibold">Urban Company</h1>
           </div>
         </div>
-        <nav>
+      </a>
+        
           <ul class="flex space-x-6 items-center">
             <li class="relative">
               <input
@@ -109,9 +111,13 @@
                 ></path>
               </svg>
             </li>
+          
           </ul>
-        </nav>
-        <div class="flex items-center">
+       
+        <div class="flex items-center gap-10">
+          <li class = 'list-none'>
+            <a href="{% url 'service' %}" >Services</a>
+          </li>
           <div class="relative">
             <img
               id="avatarButton"
@@ -122,6 +128,7 @@
               src="{% static 'MJ.jpg' %}"
               alt="User dropdown"
             />
+           
             <!-- Dropdown menu -->
             <div
               id="userDropdown"
