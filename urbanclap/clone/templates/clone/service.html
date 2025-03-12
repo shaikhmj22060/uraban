@@ -1,0 +1,223 @@
+{% extends "navbar.html" %}
+{% load static %}
+<!-- {% block main %} -->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>service</title>
+		<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+		<link rel="stylesheet" href="">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<style type="text/css">
+			.no-scroll::-webkit-scrollbar{
+				display: none;
+			}
+			.no-scrollbar {
+				-ms-overflow-style: none;  /* IE and Edge */
+				scrollbar-width: none;  /* Firefox */
+		}
+		</style>
+	</head>
+	<body class="bg-[#F5F5F5 ]">
+		<div class="parent w-screen flex p-12 gap-8 mt-8">
+			<!-- category statrt -->
+			<div class="category w-[25%]">
+				<h1 class="font-[Segoe_UI] text-4xl"  >Spa for Women</h1>
+				<div class="flex items-center py-3 gap-2 ">
+					<svg width="1.5vw" height="15%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8">
+						</path>
+					</svg>
+					<h1 class="border-b-1 border-dotted">4.83 (2.7 M bookings)  </h1>
+				</div>
+				<div class="services pl-4 py-6 w-fit mt-6 border-[#ededed] border-1 rounded-lg">
+					<div class="heading flex w-full gap-3 items-center ">
+						<h3 class="capitalize text-gray-500   text-xs">select service</h3>
+						<hr class=" text-[#ededed] w-[12.9vw]">
+					</div>
+					<div class="cards grid grid-cols-3 gap-8 py-4 ">
+						<div class="card1 space-y-2 text-center group cursor-pointer">
+							<img src="https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template,q_auto:low,f_auto/w_64,dpr_1,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/supply/customer-app-supply/1718783677528-5e8011.jpeg" width="75px" alt="">
+							<h6 class="capitalize text-xs inline-block relative">
+							post natal
+							<hr class="w-0 group-hover:w-full transition-all mt-2 duration-200 border-gray-400">
+							</h6>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- category end -->
+			<div class="list w-[75%] mt-16 flex ">
+				<div class="sub-list w-[60%]">
+					<div class="list flex flex-col gap-6 no-scroll no-scrollbar border-1 h-screen overflow-scroll scroll-smooth  px-8 w-fit py-8 border-[#ededed] cursor-pointer rounded-md">
+						<h1 class="text-3xl font-bold">Post natal</h1>
+						<div class="card-list pb-6 border-b-1  border-[#ededed]">
+							<div class="img ">
+								<img class="rounded-md transform transition duration-200 hover:scale-101" src="https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template,q_auto:low,f_auto/w_1232,dpr_1,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/supply/customer-app-supply/1681975153288-435f0a.jpeg" class=" " width="450vw" alt="">
+							</div>
+							<div class="card-desc flex items-center justify-between">
+								<div class="sub-title space-y-[2px] py-4">
+									<h4 class="uppercase text-green-700 font-semibold text-xs">bestseller</h4>
+									<h3 class=" sub-heading font-bold">Postal natal massage</h3>
+									
+									<div class="flex gap-[2px] items-center">
+										<svg width="1vw" height="15%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8">
+											</path>
+										</svg>
+										<h1 class="border-b-1 text-xs border-dotted">4.83 (195 reviews)  </h1>
+									</div>
+									<h5 class="text-xs text-gray-400 py-2"> <b class="font-bold text-black"> ₹1,648</b> <span class="line-through ml-[2px]">₹1,748</span> &bull; 1 hr 20 mins </h5>
+								</div>
+								<div class="add-btn">
+									<button class="text-purple-500 border border-purple-400 capitalize font-semibold cursor-pointer rounded-md py-1 px-6 hover:scale-105" >add</button>
+								</div>
+							</div>
+							<hr class="border-dashed border-[#ededef]">
+							<a href="#" title="" class="capitalize text-sm text-purple-600 font-semibold hover:text-purple-500">view details</a>
+						</div>	<h1 class="text-3xl font-bold">Post natal</h1>
+						<div class="card-list pb-6 border-b-1  border-[#ededed]">
+							<div class="img ">
+								<img class="rounded-md transform transition duration-200 hover:scale-101" src="https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template,q_auto:low,f_auto/w_1232,dpr_1,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/supply/customer-app-supply/1681975153288-435f0a.jpeg" class=" " width="450vw" alt="">
+							</div>
+							<div class="card-desc flex items-center justify-between">
+								<div class="sub-title space-y-[2px] py-4">
+									<h4 class="uppercase text-green-700 font-semibold text-xs">bestseller</h4>
+									<h3 class=" sub-heading font-bold">Postal natal massage</h3>
+									
+									<div class="flex gap-[2px] items-center">
+										<svg width="1vw" height="15%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8">
+											</path>
+										</svg>
+										<h1 class="border-b-1 text-xs border-dotted">4.83 (195 reviews)  </h1>
+									</div>
+									<h5 class="text-xs text-gray-400 py-2"> <b class="font-bold text-black"> ₹1,648</b> <span class="line-through ml-[2px]">₹1,748</span> &bull; 1 hr 20 mins </h5>
+								</div>
+								<div class="add-btn">
+									<button class="text-purple-500 border border-purple-400 capitalize font-semibold cursor-pointer rounded-md py-1 px-6 hover:scale-105" >add</button>
+								</div>
+							</div>
+							<hr class="border-dashed border-[#ededef]">
+							<a href="#" title="" class="capitalize text-sm text-purple-600 font-semibold hover:text-purple-500">view details</a>
+						</div>	<h1 class="text-3xl font-bold">Post natal</h1>
+						<div class="card-list pb-6 border-b-1  border-[#ededed]">
+							<div class="img ">
+								<img class="rounded-md transform transition duration-200 hover:scale-101" src="https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template,q_auto:low,f_auto/w_1232,dpr_1,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/supply/customer-app-supply/1681975153288-435f0a.jpeg" class=" " width="450vw" alt="">
+							</div>
+							<div class="card-desc flex items-center justify-between">
+								<div class="sub-title space-y-[2px] py-4">
+									<h4 class="uppercase text-green-700 font-semibold text-xs">bestseller</h4>
+									<h3 class=" sub-heading font-bold">Postal natal massage</h3>
+									
+									<div class="flex gap-[2px] items-center">
+										<svg width="1vw" height="15%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8">
+											</path>
+										</svg>
+										<h1 class="border-b-1 text-xs border-dotted">4.83 (195 reviews)  </h1>
+									</div>
+									<h5 class="text-xs text-gray-400 py-2"> <b class="font-bold text-black"> ₹1,648</b> <span class="line-through ml-[2px]">₹1,748</span> &bull; 1 hr 20 mins </h5>
+								</div>
+								<div class="add-btn">
+									<button class="text-purple-500 border border-purple-400 capitalize font-semibold cursor-pointer rounded-md py-1 px-6 hover:scale-105" >add</button>
+								</div>
+							</div>
+							<hr class="border-dashed border-[#ededef]">
+							<a href="#" title="" class="capitalize text-sm text-purple-600 font-semibold hover:text-purple-500">view details</a>
+						</div>	<h1 class="text-3xl font-bold">Post natal</h1>
+						<div class="card-list pb-6 border-b-1  border-[#ededed]">
+							<div class="img ">
+								<img class="rounded-md transform transition duration-200 hover:scale-101" src="https://res.cloudinary.com/urbanclap/image/upload/t_high_res_template,q_auto:low,f_auto/w_1232,dpr_1,fl_progressive:steep,q_auto:low,f_auto,c_limit/images/supply/customer-app-supply/1681975153288-435f0a.jpeg" class=" " width="450vw" alt="">
+							</div>
+							<div class="card-desc flex items-center justify-between">
+								<div class="sub-title space-y-[2px] py-4">
+									<h4 class="uppercase text-green-700 font-semibold text-xs">bestseller</h4>
+									<h3 class=" sub-heading font-bold">Postal natal massage</h3>
+									
+									<div class="flex gap-[2px] items-center">
+										<svg width="1vw" height="15%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8">
+											</path>
+										</svg>
+										<h1 class="border-b-1 text-xs border-dotted">4.83 (195 reviews)  </h1>
+									</div>
+									<h5 class="text-xs text-gray-400 py-2"> <b class="font-bold text-black"> ₹1,648</b> <span class="line-through ml-[2px]">₹1,748</span> &bull; 1 hr 20 mins </h5>
+								</div>
+								<div class="add-btn">
+									<button class="text-purple-500 border border-purple-400 capitalize font-semibold cursor-pointer rounded-md py-1 px-6 hover:scale-105" >add</button>
+								</div>
+							</div>
+							<hr class="border-dashed border-[#ededef]">
+							<a href="#" title="" class="capitalize text-sm text-purple-600 font-semibold hover:text-purple-500">view details</a>
+						</div>
+						<!-- end list -->
+					</div>
+				</div>
+				<div class="cart-offers w-[40%] ">
+					<div class="cart-heading border border-[#ededed] p-4">
+						<div class="cart w-full ">
+							<div class="space-y-4">
+								<!-- Cart Section -->
+								<div class="bg-white p-6 rounded-lg border border-[#ededed] text-center">
+									<img alt="Shopping cart with a bird sitting on the handle" class="mx-auto mb-4" height="100" src="https://placehold.co/100x100" width="100"/>
+									<p class="text-gray-600">
+										No items in your cart
+									</p>
+								</div>
+								<!-- Assured Reward Section -->
+								<div class="bg-white p-6 rounded-lg border border-[#ededed] flex items-center space-x-4">
+									<img alt="Discount icon" class="w-10 h-10" height="40" src="https://placehold.co/40x40" width="40"/>
+									<div>
+										<p class="text-green-600 font-semibold">
+											Assured reward from CRED
+										</p>
+										<p class="text-gray-600">
+											On all online payments
+										</p>
+										<a class="text-purple-600 font-semibold" href="#">
+											View More Offers
+											<i class="fas fa-chevron-down">
+											</i>
+										</a>
+									</div>
+								</div>
+								<!-- UC Promise Section -->
+								<div class="bg-white p-6 rounded-lg border border-[#ededed] flex items-center space-x-4">
+									<div>
+										<p class="text-black font-semibold text-lg">
+											UC Promise
+										</p>
+										<ul class="text-gray-600 space-y-1">
+											<li>
+												<i class="fas fa-check text-black">
+												</i>
+												4.5+ Rated Therapists
+											</li>
+											<li>
+												<i class="fas fa-check text-black">
+												</i>
+												Relaxation Assured
+											</li>
+											<li>
+												<i class="fas fa-check text-black">
+												</i>
+												Specialized Premium Oils
+											</li>
+										</ul>
+									</div>
+									<img alt="Quality assured badge" class="w-16 h-16" height="60" src="https://placehold.co/60x60" width="60"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+	</body>
+</html>
+{% endblock %}

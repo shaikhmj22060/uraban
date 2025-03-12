@@ -37,3 +37,6 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('login_user')
+@login_required
+def service(request):
+    return render(request,'clone/service.html')
