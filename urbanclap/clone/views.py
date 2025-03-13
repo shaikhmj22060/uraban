@@ -2,14 +2,18 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from dashboard.models import *
 # Create your views here.
 
 @login_required
 def home(request):
     return render(request,'clone/home.html')
 @login_required
-def land(request):
-    return render(request,'clone/wireframe.html')
+def view_category(request):
+    data = Category.objects.all()
+    sub_data = subcatagory.objects.all()
+    services = service.objects.all()
+    return render(request, 'clone/wireframe.html',{'data':data,'sub_data':sub_data,'services': services})
 
 def register(request):
     if request.method == 'POST':
@@ -37,6 +41,7 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('login_user')
-@login_required
-def service(request):
-    return render(request,'clone/service.html')
+
+
+
+

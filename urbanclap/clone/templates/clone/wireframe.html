@@ -4,6 +4,36 @@
     
     
 {% block main %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style type="text/css">
+    
+    /* Hide scrollbar for Chrome, Safari */
+    #scrollContainer::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Hide scrollbar for Firefox */
+    #scrollContainer {
+      scrollbar-width: none;
+    }
+    
+    /* Hide scrollbar for Edge & IE */
+    #scrollContainer {
+      -ms-overflow-style: none;
+    }
+    
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+
+
 
     <!-- Add padding to the first section to account for the fixed header -->
     <section class="pt-24 flex py-12 flex-col sm:flex-row">
@@ -16,34 +46,20 @@
           <h3 class="px-4 sm:px-6 py-4 font-semibold text-lg sm:text-[20px] text-[#545454]">What are you looking for?</h3>
           <div class="boxes my-2 flex flex-wrap justify-center items-center gap-4 cursor-pointer">
             <!-- ... rest of your category content ... -->
+             {% for data in data  %}
               <div class="flex group relative flex-col justify-center items-center">
                 <div class="content bg-[#F5F5F5] px-9 py-2 rounded-lg w-fit flex flex-col justify-center items-center">
-                  <img src="{% static 'face.png' %}" alt="Face" width="60" height="60">
+                  <img src="{{data.image.url}}" alt="Face" width="60" height="60">
                   <p class="w-max">
                     <span class="absolute -bottom-1 left-1/2 w-0 transition-all h-0.5 bg-black group-hover:w-2/6"></span>
                     <span class="absolute -bottom-1 right-1/2 w-0 transition-all h-0.5 bg-black group-hover:w-2/6"></span>
                   </p>
                 </div>
                 <div class="text-center">
-                  <span>Hover over me</span>
+                  <span>{{data.name}}</span>
                 </div>
               </div>
-              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
-                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
-                <h4 class="mt-2">womens salon</h4>
-              </div>
-              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
-                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
-                <h4 class="mt-2">womens salon</h4>
-              </div>
-              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
-                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
-                <h4 class="mt-2">womens salon</h4>
-              </div>
-              <div class="content bg-[#F5F5F5] p-2 rounded-lg w-fit flex flex-col justify-center items-center">
-                <img src="{% static 'face.png' %}" alt="Face" width="50" height="50">
-                <h4 class="mt-2">womens salon</h4>
-              </div>
+              {% endfor %}
             </div>
           </div>
         </div>
@@ -55,54 +71,43 @@
       </div>
     </section>
 
-    <!-- Hero Section -->
-    <section class=" py-12">
+    <!-- card Section -->
+    <section class="py-12 relative">
       <div class="container mx-auto px-6">
         <h1 class="text-4xl font-bold mb-6">Home services at your doorstep</h1>
-        <div class="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
-          <div class="card  p-4 rounded-lg">
+    
+        <!-- Gradient Fades -->
+        <div class="absolute top-0 bottom-0 left-0 w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute top-0 bottom-0 right-0 w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+    
+        <!-- Scroll Buttons -->
+        <button id="prev" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-5 py-4 rounded-full z-20 shadow-lg hover:bg-gray-800 transition">
+          ‹
+        </button>
+        <button id="next" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-5 py-4 rounded-full z-20 shadow-lg hover:bg-gray-800 transition">
+          ›
+        </button>
+    
+        <!-- Scrollable Cards Container -->
+        <div id="scrollContainer" class="flex overflow-x-auto scrollbar-hide scroll-smooth space-x-6 w-full px-4">
+          {% for service in services %}
+          <div class="card min-w-[350px] max-w-[400px] bg-white p-6 rounded-xl shadow-md transition-transform duration-300 hover:scale-[1.05] hover:shadow-lg">
             <img
-              src="{% static 'MJ.jpg' %}"
-              alt="Salon at home service"
-              class="w-full h-40 object-cover rounded mb-4"
+              src="{{ service.image.url }}"
+              alt="{{ service.name }}"
+              class="w-full h-[200px] object-cover rounded-lg mb-4"
               loading="lazy"
             />
-            <h2 class="text-lg font-semibold">Salon at home</h2>
-            <p class="text-gray-500">Relax and rejuvenate</p>
+            <h2 class="text-xl font-semibold">{{ service.name }}</h2>
+            <p class="text-gray-500 text-sm">{{ service.price }}</p>
           </div>
-          <div class="card bg-white p-4 rounded-lg">
-            <img
-              src="https://images.unsplash.com/photo-1734779205331-4566d6965fa2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw3fHx8ZW58MHx8fHx8"
-              alt="Electricians service"
-              class="w-full h-40 object-cover rounded mb-4"
-              loading="lazy"
-            />
-            <h2 class="text-lg font-semibold">Electricians</h2>
-            <p class="text-gray-500">Expert solutions</p>
-          </div>
-          <div class="card bg-white p-4 rounded-lg">
-            <img
-              src="https://plus.unsplash.com/premium_photo-1686593681087-774c9c55fed2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Plumbers service"
-              class="w-full h-40 object-cover rounded mb-4"
-              loading="lazy"
-            />
-            <h2 class="text-lg font-semibold">Plumbers</h2>
-            <p class="text-gray-500">Fix your issues</p>
-          </div>
-          <div class="card bg-white p-4 rounded-lg">
-            <img
-              src="https://images.unsplash.com/photo-1741017269648-44a2497aba20?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw5fHx8ZW58MHx8fHx8"
-              alt="Cleaning service"
-              class="w-full h-40 object-cover rounded mb-4"
-              loading="lazy"
-            />
-            <h2 class="text-lg font-semibold">Cleaning</h2>
-            <p class="text-gray-500">Sparkling spaces</p>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </section>
+    
+    
+    
 
     <!-- New and Noteworthy Section -->
     <section class="py-12">
@@ -163,7 +168,28 @@
         </div>
       </div>
     </section>
-
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const scrollContainer = document.getElementById("scrollContainer");
+        const nextBtn = document.getElementById("next");
+        const prevBtn = document.getElementById("prev");
+    
+        // Scroll amount = width of 1 card + margin (adjustable)
+        const cardWidth = document.querySelector(".card").offsetWidth + 24; // Adjust based on spacing
+    
+        nextBtn.addEventListener("click", () => {
+          scrollContainer.scrollBy({ left: cardWidth, behavior: "smooth" });
+        });
+    
+        prevBtn.addEventListener("click", () => {
+          scrollContainer.scrollBy({ left: -cardWidth, behavior: "smooth" });
+        });
+      });
+      
+    </script>
+      
+</body>
+</html>
     
     
     {% endblock %}
