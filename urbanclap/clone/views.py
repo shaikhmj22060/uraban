@@ -49,6 +49,13 @@ def logout_user(request):
     logout(request)
     return redirect('login_user')
 
+def search_service(request):
+    query = request.GET.get('q')  # Get the search term from the URL
+    results = []
 
+    if query:
+        results = service.objects.filter(name__icontains=query)  # Case-insensitive search
+
+    return render(request, 'clone/search.html', {'results': results, 'query': query})
 
 

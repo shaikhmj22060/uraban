@@ -45,10 +45,13 @@
             </a> 
             <ul class="flex space-x-6 items-center"> 
                 <li class="relative"> 
-                    <input type="search" name="search" placeholder="Search..." class="rounded-lg border border-[#e3e3e3] focus:border-black pl-10 pr-4 py-2" /> 
-                    <svg class="w-5 h-5 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
+                    <form action="{% url 'search_service' %}" method="get">
+                    <input type="search" name="q" placeholder="Search..." class="rounded-lg border border-[#e3e3e3] focus:border-black pl-10 pr-4 py-2" /> 
+                    
+                    <svg type = "submit" class="w-5 h-5 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18a8 8 0 100-16 8 8 0 000 16zm7-7l4 4"></path> 
                     </svg> 
+                </form>
                 </li> 
             </ul> 
             <div class="flex items-center gap-10"> 
