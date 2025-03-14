@@ -8,6 +8,13 @@ from dashboard.models import *
 @login_required
 def home(request):
     return render(request,'clone/home.html')
+
+
+
+@login_required
+def service_page(request):
+    return render(request,'clone/service.html')
+
 @login_required
 def view_category(request):
     data = Category.objects.all()
