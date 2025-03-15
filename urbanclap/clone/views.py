@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import get_object_or_404, render,redirect
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -14,6 +14,8 @@ def home(request):
 @login_required
 def service_page(request):
     return render(request,'clone/service.html')
+
+
 
 @login_required
 def view_category(request):
@@ -40,6 +42,7 @@ def login_user(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
+            request.session.modified = True  # Ensure session is kept
             return redirect('home')
         else:
             return render(request, 'clone/index.html', {'error_message': 'Invalid login'})
@@ -58,4 +61,61 @@ def search_service(request):
 
     return render(request, 'clone/search.html', {'results': results, 'query': query})
 
+# cart views
+@login_required
+def add_to_cart(request, service_id):
+    services = get_object_or_404(service, id=service_id)
+    cart_item, created = Cart.objects.get_or_create(user=request.user, service=services)
 
+    if not created:
+        cart_item.quantity += 1  # Increase quantity if already in cart
+        cart_item.save()
+
+    return redirect("cart_view")
+
+@login_required
+def cart_view(request):
+    cart_items = Cart.objects.filter(user=request.user)  # Only get items for the logged-in user
+
+    total_price = sum(item.service.price * item.quantity for item in cart_items)
+    cart_item_count = cart_items.count()  # Count different services, not quantity
+
+    context = {
+        "cart_items": cart_items,
+        "total_price": total_price,
+        "cart_item_count": cart_item_count
+    }
+    
+    return render(request, "clone/cart.html", context)
+
+@login_required
+def increase_quantity(request, service_id):
+    cart_item = Cart.objects.filter(user=request.user, service_id=service_id).first()
+    if cart_item:
+        cart_item.quantity += 1
+        cart_item.save()
+    
+    return redirect('cart_view')
+
+@login_required
+def decrease_quantity(request, service_id):
+    cart_item = Cart.objects.filter(user=request.user, service_id=service_id).first()
+    
+    if cart_item:
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()  # Remove item if quantity reaches 0
+    
+    return redirect('cart_view')
+
+@login_required
+def remove_from_cart(request, service_id):
+    Cart.objects.filter(user=request.user, service_id=service_id).delete()
+    return redirect('cart_view')
+
+@login_required
+def clear_cart(request):
+    Cart.objects.filter(user=request.user).delete()
+    return redirect('cart_view')

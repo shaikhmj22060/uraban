@@ -33,8 +33,6 @@
 </head>
 <body>
 
-
-
     <!-- Add padding to the first section to account for the fixed header -->
     <section class="pt-24 flex py-12 flex-col sm:flex-row">
       <!-- Left Section - Modified for responsiveness -->
@@ -100,6 +98,11 @@
             />
             <h2 class="text-xl font-semibold">{{ service.name }}</h2>
             <p class="text-gray-500 text-sm">{{ service.price }}</p>
+            <form method="POST" action="{% url 'add_to_cart' service.id %}">
+              {% csrf_token %}
+              <button type="submit" class="bg-black text-white px-4 py-2 rounded-lg">Add to Cart</button>
+          </form>
+          
           </div>
           {% endfor %}
         </div>

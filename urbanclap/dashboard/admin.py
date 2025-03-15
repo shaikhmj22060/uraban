@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(Category)
 admin.site.register(subcatagory)
 admin.site.register(service)
+admin.site.register(Cart)

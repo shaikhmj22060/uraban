@@ -3,7 +3,10 @@
 {% if results %}
     <ul>
         {% for service in results %}
+        <a href="{% url 'service' %}">
+        <img src="{{ service.image.url }}" alt="" width="100" height="100">
             <li>{{ service.name }} - {{ service.description }}</li>
+        </a>
         {% endfor %}
     </ul>
 {% else %}
