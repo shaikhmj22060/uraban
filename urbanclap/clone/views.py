@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from django.contrib.auth import authenticate, login, logout 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from dashboard.models import *
 # Create your views here.
@@ -18,35 +18,56 @@ def service_page(request):
 
 
 @login_required
-def view_category(request):
+def view_category_client(request):
     data = Category.objects.all()
     sub_data = subcatagory.objects.all()
     services = service.objects.all()
     return render(request, 'clone/wireframe.html',{'data':data,'sub_data':sub_data,'services': services})
+def is_admin(user):
+    return user.is_authenticated and getattr(user, "role", None) == "admin"
+
+@login_required
+@user_passes_test(is_admin)  # Redirect to custom login page
+def admin_dashboard(request):
+    return render(request, 'dashboard/dashboard.html')
 
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-        user = User.objects.create_user(username=username, email=email ,password=password)
+        role = request.POST['role']
+        
+        user = custom_user.objects.create_user(username=username, email=email, password=password, role=role)
         user.save()
-        login(request,user)
-        return redirect('home')
-    return render(request,'clone/register.html')
+        login(request, user)
+        return redirect('home')  # Redirect after login
+
+    return render(request, 'clone/register.html')
 
 def login_user(request):
     if request.method == 'POST':
-        username = request.POST['email']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
+        email = request.POST.get('email')  # Use .get() to avoid KeyError
+        password = request.POST.get('password')
+
+        user = authenticate(username=email, password=password)
         if user is not None:
             login(request, user)
-            request.session.modified = True  # Ensure session is kept
-            return redirect('home')
+
+            # Redirect based on user role
+            if user.role == 'admin':
+                return redirect('dashboard')
+            # elif user.role == 'service_provider':
+            #     return redirect('service_provider_dashboard')
+            elif user.role == 'client':
+                return redirect('wire')
+            else:
+                return redirect('home')  # Default redirect if no role is set
+            
         else:
-            return render(request, 'clone/index.html', {'error_message': 'Invalid login'})
-    return render(request,'clone/index.html')
+            return render(request, 'clone/index.html', {'error_message': 'Invalid credentials'})
+
+    return render(request, 'clone/index.html')
 
 def logout_user(request):
     logout(request)

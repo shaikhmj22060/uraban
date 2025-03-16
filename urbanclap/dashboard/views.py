@@ -8,6 +8,9 @@ from .forms import *
 def dashboard(request):
     return render(request, 'dashboard/dashboard.html')
 
+def admin_profile(request):
+    return render(request, 'dashboard/admin_profile.html')
+
 def view_category(request):
     data = Category.objects.all()
     sub_data = subcatagory.objects.all()

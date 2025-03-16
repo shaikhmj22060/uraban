@@ -1,10 +1,12 @@
 from django.urls import path
 from .views import *
+from clone.views import *
 
 urlpatterns = [
-    path('', dashboard, name = 'dashboard'),
+    path('', admin_dashboard, name = 'dashboard'),
+    path('profile/', admin_profile, name = 'profile'),
     # category urls
-    path('category/', view_category , name = 'view_category'),
+    path('category/', view_category , name = 'category'),
     path('editcatgory/<int:id>/',edit_category,name='edit_category'),
     path('createcat/',create_category,name='createcat'),
     path('deletecat/<int:id>/',delete_category,name='deletecat'),
