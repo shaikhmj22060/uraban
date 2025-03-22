@@ -1,0 +1,53 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Main Container -->
+<div class="flex flex-col space-y-6 p-6 bg-gray-200 min-h-screen">
+
+    <!-- All Users Section -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden flex-1 flex flex-col">
+        <div class="p-4 border-b border-b-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">All Users</h3>
+        </div>
+        <div class="overflow-y-auto flex-1">
+            <table class="w-full text-sm text-left text-gray-900">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-center">Profile Image</th>
+                        <th scope="col" class="px-6 py-3 text-center">Name</th>
+                        <th scope="col" class="px-6 py-3 text-center">Username</th>
+                        <th scope="col" class="px-6 py-3 text-center">Email</th>
+                        <th scope="col" class="px-6 py-3 text-center">Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex justify-center items-center">
+                                {% if user.profile_image %}
+                                    <img src="{{ user.profile_image.url }}" alt="Profile" class="w-12 h-12 object-cover rounded-full">
+                                {% else %}
+                                    <span class="material-icons text-gray-400 text-4xl">account_circle</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">{{ user.name|default:user.username }}</td>
+                        <td class="px-6 py-4 text-center">{{ user.username }}</td>
+                        <td class="px-6 py-4 text-center">{{ user.email }}</td>
+                        <td class="px-6 py-4 text-center">{{ user.get_role_display }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

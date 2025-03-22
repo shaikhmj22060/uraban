@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from .models import *
 from .forms import *
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 # Create your views here.
 
@@ -10,6 +12,11 @@ def dashboard(request):
 
 def admin_profile(request):
     return render(request, 'dashboard/admin_profile.html')
+
+def all_users_view(request):
+    users = custom_user.objects.all()
+    return render(request, 'dashboard/users.html', {'users': users})
+
 
 def view_category(request):
     data = Category.objects.all()
@@ -164,3 +171,61 @@ def delete_service(request, id):
     services = get_object_or_404(service, id=id)
     services.delete()
     return redirect('view_service')
+
+
+
+@login_required
+def profile_view(request):
+    user = request.user  # Get the logged-in user
+
+    if request.method == "POST":
+        name = request.POST.get("name", user.username)
+        email = request.POST.get("email", user.email)
+        profile_image = request.FILES.get("profile_image")
+
+        # Update user details
+        user.username = name
+        user.email = email
+
+        if profile_image:
+            user.profile_image = profile_image  # Save new profile image if uploaded
+
+        user.save()
+        messages.success(request, "Profile updated successfully!")
+        return redirect("profile")  # Redirect back to profile page after update
+
+    return render(request, "dashboard/admin_profile.html", {"user": user})
+
+
+def users_by_roles(request):
+    role = request.GET.get('role', 'client')
+    users = custom_user.objects.filter(role=role)
+    return render(request, 'dashboard/roles.html', {'users': users})
+
+def create_admin(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        profile_image = request.FILES.get('profile_image')
+        
+        if custom_user.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+            return redirect('roles')
+        
+        if custom_user.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists.')
+            return redirect('roles')
+        
+        # Create admin user
+        custom_user.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            role='admin',
+            profile_image=profile_image
+        )
+        messages.success(request, 'Admin created successfully.')
+        return redirect('roles')
+    
+    return redirect('roles')

@@ -1,81 +1,72 @@
-{% extends "comman.html" %}
-{% load static %}
+{% extends 'comman.html' %}
 {% block main %}
+{% load static %}
 
 <div class="container mx-auto p-6">
-    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-        <!-- Profile Header -->
-        <div class="flex items-center space-x-6">
-            <!-- Profile Image -->
-            <div class="relative">
-                <img src="{{ user.profile_image.url }}" alt="Profile Image" class="w-24 h-24 rounded-full border-4 border-gray-300">
-                <button onclick="openImageModal()" class="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full text-white shadow-md">
-                    <i class="fas fa-camera"></i>
-                </button>
-            </div>
-            
-            <!-- User Info -->
-            <div>
-                <h2 class="text-2xl font-semibold">{{ user.full_name }}</h2>
-                <p class="text-gray-500">{{ user.email }}</p>
-                <span class="text-sm text-gray-600 bg-gray-200 px-3 py-1 rounded">{{ user.role }}</span>
-            </div>
-        </div>
-
-        <!-- Profile Details -->
-        <div class="mt-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="flex items-center space-x-3 bg-gray-100 p-4 rounded-lg">
-                    <i class="fas fa-phone-alt text-blue-600 text-lg"></i>
-                    <div>
-                        <p class="text-gray-500 text-sm">Phone</p>
-                        <p class="font-medium">{{ user.phone }}</p>
-                    </div>
-                    <button onclick="openPhoneModal()" class="ml-auto text-blue-500 hover:text-blue-700">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
-
-                <div class="flex items-center space-x-3 bg-gray-100 p-4 rounded-lg">
-                    <i class="fas fa-map-marker-alt text-red-500 text-lg"></i>
-                    <div>
-                        <p class="text-gray-500 text-sm">Address</p>
-                        <p class="font-medium">{{ user.address }}</p>
-                    </div>
-                    <button onclick="openAddressModal()" class="ml-auto text-blue-500 hover:text-blue-700">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Image Upload Modal -->
-<div id="imageModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
-        <h2 class="text-lg font-semibold mb-4">Update Profile Image</h2>
-        <form method="POST" enctype="multipart/form-data">
+    <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg mx-auto">
+        <h2 class="text-2xl font-semibold mb-4">Profile</h2>
+        <form method="post" enctype="multipart/form-data" id="profile-form">
             {% csrf_token %}
-            <input type="file" name="profile_image" class="w-full border rounded p-2">
-            <div class="flex justify-end mt-4">
-                <button type="button" onclick="closeImageModal()" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Upload</button>
+            
+            <!-- Profile Image -->
+            <div class="mb-4 flex items-center">
+                <img id="profile-img" src="{{ user.profile_image.url }}" alt="Profile Image" class="w-16 h-16 rounded-full object-cover border">
+                <label for="profile_image" class="ml-4 cursor-pointer text-blue-500 hover:underline">Change</label>
+                <input type="file" name="profile_image" id="profile_image" class="hidden">
             </div>
+
+            <!-- Name -->
+            <div class="mb-4 flex justify-between items-center">
+                <label class="text-gray-700">Name:</label>
+                <div class="flex items-center w-2/3">
+                    <span id="name-text">{{ user.username | title }}</span>
+                    <input type="text" name="name" id="name" class="hidden border rounded p-1 w-full" value="{{ user.username }}">
+                    <button type="button" class="ml-2 text-blue-500 edit-btn" data-target="name">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M16 3l5 5m-9 4L21 7M16 3l5 5"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4 flex justify-between items-center">
+                <label class="text-gray-700">Email:</label>
+                <div class="flex items-center w-2/3">
+                    <span id="email-text">{{ user.email }}</span>
+                    <input type="email" name="email" id="email" class="hidden border rounded p-1 w-full" value="{{ user.email }}">
+                    <button type="button" class="ml-2 text-blue-500 edit-btn" data-target="email">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M16 3l5 5m-9 4L21 7M16 3l5 5"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button type="submit" id="save-btn" class="hidden bg-green-500 text-white px-4 py-2 rounded w-full mt-4">Save</button>
         </form>
-        <button onclick="closeImageModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl">&times;</button>
     </div>
 </div>
 
-<!-- JavaScript for Modals -->
 <script>
-    function openImageModal() {
-        document.getElementById('imageModal').classList.remove('hidden');
-    }
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            let target = this.getAttribute('data-target');
+            let textElement = document.getElementById(target + '-text');
+            let inputElement = document.getElementById(target);
 
-    function closeImageModal() {
-        document.getElementById('imageModal').classList.add('hidden');
-    }
+            // Hide the text and show the input field
+            textElement.classList.add('hidden');
+            inputElement.classList.remove('hidden');
+
+            // Show save button
+            document.getElementById('save-btn').classList.remove('hidden');
+
+            // Focus on the input field for better UX
+            inputElement.focus();
+        });
+    });
 </script>
 
 {% endblock %}

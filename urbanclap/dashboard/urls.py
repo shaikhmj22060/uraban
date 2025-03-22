@@ -4,7 +4,10 @@ from clone.views import *
 
 urlpatterns = [
     path('', admin_dashboard, name = 'dashboard'),
-    path('profile/', admin_profile, name = 'profile'),
+    path('profile/', profile_view, name = 'profile'),
+    path('users/', all_users_view, name = 'users'),
+    path('roles/', users_by_roles, name = 'roles'),
+     path('create-admin/', create_admin, name='create_admin'),
     # category urls
     path('category/', view_category , name = 'category'),
     path('editcatgory/<int:id>/',edit_category,name='edit_category'),

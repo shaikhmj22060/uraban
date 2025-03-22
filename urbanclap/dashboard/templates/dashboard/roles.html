@@ -1,0 +1,114 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+
+<!-- Main Container -->
+<div class="flex flex-col space-y-6 p-6 bg-gray-200 min-h-screen">
+
+    <!-- Roles and Filters Section -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden flex-1 flex flex-col">
+        <div class="p-4 border-b border-b-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Users by Roles</h3>
+            <div class="flex space-x-4">
+                <!-- Role Filter Dropdown -->
+                <select id="roleFilter" class="border rounded-md p-2">
+                    <option value="client" {% if request.GET.role == "client" %}selected{% endif %}>Clients</option>
+                    <option value="admin" {% if request.GET.role == "admin" %}selected{% endif %}>Admins</option>
+                    <option value="service_provider" {% if request.GET.role == "service_provider" %}selected{% endif %}>Service Providers</option>
+                </select>
+                
+                <!-- Add Admin Button -->
+                <button data-modal-target="addAdminModal" data-modal-toggle="addAdminModal" class="px-4 py-2 text-white bg-[#D63A1F] hover:bg-[#B72E19] rounded-md">
+                    Add Admin
+                </button>
+            </div>
+        </div>
+        
+        <div class="overflow-y-auto flex-1">
+            <table class="w-full text-sm text-left text-gray-900">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                    <tr>
+                        <th class="px-6 py-3 text-center">Profile Image</th>
+                        <th class="px-6 py-3 text-center">Name</th>
+                        <th class="px-6 py-3 text-center">Username</th>
+                        <th class="px-6 py-3 text-center">Email</th>
+                        <th class="px-6 py-3 text-center">Role</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    {% for user in users %}
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 text-center">
+                            {% if user.profile_image %}
+                                <img src="{{ user.profile_image.url }}" alt="Profile" class="w-12 h-12 object-cover rounded-full mx-auto">
+                            {% else %}
+                                <span class="material-icons text-gray-400">account_circle</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-center">{{ user.name|default:user.username }}</td>
+                        <td class="px-6 py-4 text-center">{{ user.username }}</td>
+                        <td class="px-6 py-4 text-center">{{ user.email }}</td>
+                        <td class="px-6 py-4 text-center">{{ user.get_role_display }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div id="addAdminModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+                <h3 class="text-lg font-semibold text-gray-900">Create Admin User</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="addAdminModal">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-4">
+                <form action="{% url 'create_admin' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-900">Username</label>
+                        <input type="text" name="username" class="mt-1 p-2 w-full border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-900">Email</label>
+                        <input type="email" name="email" class="mt-1 p-2 w-full border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-900">Password</label>
+                        <input type="password" name="password" class="mt-1 p-2 w-full border rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-900">Profile Image (Optional)</label>
+                        <input type="file" name="profile_image" class="mt-1 p-2 w-full border rounded-md">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 text-white bg-[#D63A1F] hover:bg-[#B72E19] rounded-md">Create Admin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('roleFilter').addEventListener('change', function() {
+        const role = this.value;
+        window.location.href = `?role=${role}`;
+    });
+</script>
+
+{% endblock %}

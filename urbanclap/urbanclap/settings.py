@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'theme',
     'clone',
     'dashboard',
+    'service_provider',
     'django_browser_reload',
 ]
 TAILWIND_APP_NAME = 'theme'
