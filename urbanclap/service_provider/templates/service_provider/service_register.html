@@ -10,7 +10,7 @@
 <body class="bg-gray-100 h-screen flex items-center justify-center">
   <div class="w-full max-w-lg p-8 space-y-6 bg-white rounded-lg shadow-md">
     <h2 class="text-2xl font-bold text-center">Service Provider Registration</h2>
-    <form id="registerForm" enctype="multipart/form-data" id = "registerForm" class="space-y-4">
+    <form id="registerForm" enctype="multipart/form-data" class="space-y-4">
       {% csrf_token %}
       
       <div>
@@ -54,6 +54,12 @@
       try {
         const response = await axios.post('{% url "Sregister" %}', formData);
         showToast(response.data.message, response.data.status === 'success' ? 'green' : 'red');
+
+        if (response.data.status === 'success' && response.data.redirect) {
+          setTimeout(() => {
+            window.location.href = response.data.redirect; // Redirect to login page
+          }, 1500); // 1.5s delay to show toast
+        }
       } catch (error) {
         showToast('Something went wrong. Please try again.', 'red');
       }
@@ -68,11 +74,6 @@
         toast.classList.add('hidden');
       }, 3000);
     }
-    document.getElementById('registerForm').addEventListener('submit', function() {
-        setTimeout(() => {
-          this.reset();
-        }, 100); // Clear the form after submission
-      });
   </script>
 </body>
 </html>

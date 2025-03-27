@@ -1,0 +1,72 @@
+{% extends 'service_dashboard.html' %}
+{% block s_provider %}
+{% load static %}
+
+<div class="container mx-auto p-6">
+    <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg mx-auto">
+        <h2 class="text-2xl font-semibold mb-4">Profile</h2>
+        <form method="post" enctype="multipart/form-data" id="profile-form">
+            {% csrf_token %}
+            
+            <!-- Profile Image -->
+            <div class="mb-4 flex items-center">
+                <img id="profile-img" src="{{ user.profile_image.url }}" alt="Profile Image" class="w-16 h-16 rounded-full object-cover border">
+                <label for="profile_image" class="ml-4 cursor-pointer text-blue-500 hover:underline">Change</label>
+                <input type="file" name="profile_image" id="profile_image" class="hidden">
+            </div>
+
+            <!-- Name -->
+            <div class="mb-4 flex justify-between items-center">
+                <label class="text-gray-700">Name:</label>
+                <div class="flex items-center w-2/3">
+                    <span id="name-text">{{ user.username | title }}</span>
+                    <input type="text" name="name" id="name" class="hidden border rounded p-1 w-full" value="{{ user.username }}">
+                    <button type="button" class="ml-2 text-blue-500 edit-btn" data-target="name">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M16 3l5 5m-9 4L21 7M16 3l5 5"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4 flex justify-between items-center">
+                <label class="text-gray-700">Email:</label>
+                <div class="flex items-center w-2/3">
+                    <span id="email-text">{{ user.email }}</span>
+                    <input type="email" name="email" id="email" class="hidden border rounded p-1 w-full" value="{{ user.email }}">
+                    <button type="button" class="ml-2 text-blue-500 edit-btn" data-target="email">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M16 3l5 5m-9 4L21 7M16 3l5 5"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button type="submit" id="save-btn" class="hidden bg-green-500 text-white px-4 py-2 rounded w-full mt-4">Save</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            let target = this.getAttribute('data-target');
+            let textElement = document.getElementById(target + '-text');
+            let inputElement = document.getElementById(target);
+
+            // Hide the text and show the input field
+            textElement.classList.add('hidden');
+            inputElement.classList.remove('hidden');
+
+            // Show save button
+            document.getElementById('save-btn').classList.remove('hidden');
+
+            // Focus on the input field for better UX
+            inputElement.focus();
+        });
+    });
+</script>
+
+{% endblock %}

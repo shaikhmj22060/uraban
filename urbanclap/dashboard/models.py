@@ -59,3 +59,13 @@ class custom_user(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+class KYCRecord(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=[('approved', 'Approved'), ('rejected', 'Rejected')])
+    reason = models.TextField(blank=True, null=True)  # Only used if rejected
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.status}"
+

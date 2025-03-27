@@ -43,8 +43,22 @@ INSTALLED_APPS = [
     'clone',
     'dashboard',
     'service_provider',
+    'channels',
     'django_browser_reload',
 ]
+
+ASGI_APPLICATION = 'urbanclap.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
 TAILWIND_APP_NAME = 'theme'
 INTERNAL_IPS = [
     "127.0.0.1",

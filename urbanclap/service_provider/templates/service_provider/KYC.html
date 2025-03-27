@@ -1,0 +1,133 @@
+{% extends "service_dashboard.html" %}
+{% block s_provider %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<div class="w-full h-full flex items-center justify-center p-6">
+  <div class="w-full max-w-lg p-8 space-y-8 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center">KYC Registration</h2>
+   
+    <form id="kycForm" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+     
+      <!-- Step 1 -->
+      <div class="step space-y-4" id="step-1">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Full Name</label>
+          <input type="text" name="name" id="name" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+          <input type="text" name="phone_number" id="phone_number" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Address</label>
+          <textarea name="address" id="address" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">City</label>
+            <input type="text" name="city" id="city" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">State</label>
+            <input type="text" name="state" id="state" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+          </div>
+        </div>
+      </div>
+     
+      <!-- Step 2 -->
+      <div class="step hidden space-y-4" id="step-2">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Category</label>
+          <select name="cat" id="cat" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+            <option value="">Select Category</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Subcategory</label>
+          <select name="subcat" id="subcat" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+            <option value="">Select Subcategory</option>
+            {% for subcategory in subcategories %}
+              <option value="{{ subcategory.id }}">{{ subcategory.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="step hidden space-y-4" id="step-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">ID Proof</label>
+          <input type="file" name="id_proof" id="id_proof" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Address Proof</label>
+          <input type="file" name="address_proof" id="address_proof" class="w-full mt-2 p-3 border border-gray-300 rounded-md" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Certificate (Optional)</label>
+          <input type="file" name="certificate" id="certificate" class="w-full mt-2 p-3 border border-gray-300 rounded-md">
+        </div>
+      </div>
+      <!-- Navigation Buttons -->
+      <div class="flex justify-between pt-8">
+        <button type="button" id="prevBtn" class="hidden px-6 py-3 bg-gray-500 text-white rounded-md font-semibold hover:bg-gray-600 transition">Back</button>
+        <button type="button" id="nextBtn" class="px-6 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition">Next</button>
+      </div>
+    </form>
+    <!-- Toast Container -->
+    <div id="toast" class="hidden fixed top-5 right-5 px-4 py-2 rounded-lg shadow-md text-white z-50"></div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let currentStep = 1;
+    
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach((el, index) => {
+        el.classList.toggle('hidden', index + 1 !== step);
+      });
+      document.getElementById('prevBtn').classList.toggle('hidden', step === 1);
+      document.getElementById('nextBtn').innerText = step === 3 ? 'Submit' : 'Next';
+    }
+    
+    document.getElementById('nextBtn').addEventListener('click', async () => {
+      if (currentStep < 3) {
+        currentStep++;
+        showStep(currentStep);
+      } else {
+        const formData = new FormData(document.getElementById('kycForm'));
+        try {
+          const response = await axios.post("{% url 'kyc_register' %}", formData);
+          showToast(response.data.message, 'green');
+        } catch (error) {
+          const errorMsg = error.response?.data?.message || 'Something went wrong. Please try again.';
+          showToast(errorMsg, 'red');
+        }
+      }
+    });
+    
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    });
+    
+    function showToast(message, color) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.backgroundColor = color === 'red' ? '#DC2626' : '#16A34A';
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+    
+    showStep(currentStep);
+  });
+</script>
+{% endblock %}

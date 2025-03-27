@@ -5,24 +5,28 @@ from django.contrib.auth.models import User
 from dashboard.models import *
 # Create your views here.
 
-@login_required
+def is_client(user):
+    return user.is_authenticated and user.role == 'client'
+
+
 def home(request):
     return render(request,'clone/home.html')
 
 
 
-@login_required
+
 def service_page(request):
     return render(request,'clone/service.html')
 
 
 
-@login_required
+
 def view_category_client(request):
     data = Category.objects.all()
     sub_data = subcatagory.objects.all()
     services = service.objects.all()
     return render(request, 'clone/wireframe.html',{'data':data,'sub_data':sub_data,'services': services})
+
 def is_admin(user):
     return user.is_authenticated and getattr(user, "role", None) == "admin"
 
@@ -57,8 +61,8 @@ def login_user(request):
             # Redirect based on user role
             if user.role == 'admin':
                 return redirect('dashboard')
-            # elif user.role == 'service_provider':
-            #     return redirect('service_provider_dashboard')
+            elif user.role == 'service_provider':
+                 return redirect('provider_dashboard')
             elif user.role == 'client':
                 return redirect('wire')
             else:
@@ -84,6 +88,7 @@ def search_service(request):
 
 # cart views
 @login_required
+@user_passes_test(is_client)
 def add_to_cart(request, service_id):
     services = get_object_or_404(service, id=service_id)
     cart_item, created = Cart.objects.get_or_create(user=request.user, service=services)
@@ -95,6 +100,7 @@ def add_to_cart(request, service_id):
     return redirect("cart_view")
 
 @login_required
+@user_passes_test(is_client)
 def cart_view(request):
     cart_items = Cart.objects.filter(user=request.user)  # Only get items for the logged-in user
 
@@ -110,6 +116,7 @@ def cart_view(request):
     return render(request, "clone/cart.html", context)
 
 @login_required
+@user_passes_test(is_client)
 def increase_quantity(request, service_id):
     cart_item = Cart.objects.filter(user=request.user, service_id=service_id).first()
     if cart_item:
@@ -119,6 +126,7 @@ def increase_quantity(request, service_id):
     return redirect('cart_view')
 
 @login_required
+@user_passes_test(is_client)
 def decrease_quantity(request, service_id):
     cart_item = Cart.objects.filter(user=request.user, service_id=service_id).first()
     
@@ -132,11 +140,13 @@ def decrease_quantity(request, service_id):
     return redirect('cart_view')
 
 @login_required
+@user_passes_test(is_client)
 def remove_from_cart(request, service_id):
     Cart.objects.filter(user=request.user, service_id=service_id).delete()
     return redirect('cart_view')
 
 @login_required
+@user_passes_test(is_client)
 def clear_cart(request):
     Cart.objects.filter(user=request.user).delete()
     return redirect('cart_view')

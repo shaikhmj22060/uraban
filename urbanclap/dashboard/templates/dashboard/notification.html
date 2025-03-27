@@ -1,0 +1,65 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<!-- Notifications Section -->
+<div class="flex justify-center items-center min-h-screen">
+  <div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold mb-6 text-center">Messages</h1>
+
+    {% if notifications %}
+      <ul class="space-y-4">
+        {% for notification in notifications %}
+          <li class="p-6 border rounded-lg shadow-md bg-gray-50">
+            <p class="text-lg font-semibold">{{ notification.message }}</p>
+            <p class="text-sm text-gray-500 mt-2">{{ notification.created_at|date:"F j, Y, g:i a" }}</p>
+            {% if notification.service_provider %}
+              <div class="mt-4 flex justify-center gap-4">
+                <a href="{% url 'review_kyc' notification.service_provider.id %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Review</a>
+                <a href="{% url 'approve_kyc' notification.service_provider.id %}" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Approve</a>
+                <button onclick="openModal({{ notification.service_provider.id }})" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Reject</button>
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-500 text-center">No Message found.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Rejection Modal with Flowbite Integration -->
+<div id="rejectModal" tabindex="-1" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+    <h2 class="text-xl font-bold mb-4">Reject KYC</h2>
+    <form id="rejectForm" method="post" action="" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="service_provider_id" id="service_provider_id">
+      
+      <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Rejection</label>
+      <textarea id="reason" name="reason" rows="4" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter reason here..." required></textarea>
+      
+      <div class="flex justify-end space-x-4">
+        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Flowbite and Script -->
+<script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+<script>
+  function openModal(serviceProviderId) {
+    document.getElementById('rejectModal').classList.remove('hidden');
+    document.getElementById('service_provider_id').value = serviceProviderId;
+    const form = document.getElementById('rejectForm');
+    form.action = `{% url 'reject_kyc' 0 %}`.replace('0', serviceProviderId);
+  }
+
+  function closeModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+    document.getElementById('reason').value = ''; // Clear input
+  }
+</script>
+{% endblock %}

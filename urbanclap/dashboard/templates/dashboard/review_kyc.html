@@ -1,0 +1,86 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<div class="max-w-lg mx-auto p-8 bg-white shadow-lg rounded-lg">
+  <h1 class="text-2xl font-bold mb-6 text-center">Review KYC Details</h1>
+
+  <div class="space-y-4">
+    <p><strong>Full Name:</strong> {{ service_provider.user.name }}</p>
+    <p><strong>Phone Number:</strong> {{ service_provider.phone_number }}</p>
+    <p><strong>Address:</strong> {{ service_provider.address }}</p>
+    <p><strong>City:</strong> {{ service_provider.city }}</p>
+    <p><strong>State:</strong> {{ service_provider.state }}</p>
+    <p><strong>Category:</strong> {{ service_provider.cat.name }}</p>
+    <p><strong>Subcategory:</strong> {{ service_provider.subcat.name }}</p>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6">Uploaded Documents</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <p class="font-medium">ID Proof:</p>
+      <img src="{{ service_provider.id_proof.url }}" alt="ID Proof" class="w-full h-40 object-cover rounded-lg border cursor-pointer" onclick="showImageModal('{{ service_provider.id_proof.url }}')">
+    </div>
+
+    <div>
+      <p class="font-medium">Address Proof:</p>
+      <img src="{{ service_provider.address_proof.url }}" alt="Address Proof" class="w-full h-40 object-cover rounded-lg border cursor-pointer" onclick="showImageModal('{{ service_provider.address_proof.url }}')">
+    </div>
+
+    {% if service_provider.certificate %}
+    <div>
+      <p class="font-medium">Certificate:</p>
+      <img src="{{ service_provider.certificate.url }}" alt="Certificate" class="w-full h-40 object-cover rounded-lg border cursor-pointer" onclick="showImageModal('{{ service_provider.certificate.url }}')">
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="mt-8 flex justify-center gap-4">
+    <a href="{% url 'approve_kyc' service_provider.id %}" class="px-6 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">Approve</a>
+    <button onclick="openRejectModal()" class="px-6 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600">Reject</button>
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 hidden bg-black bg-opacity-80 flex justify-center items-center z-50">
+  <img id="modalImage" class="max-w-full max-h-full">
+  <button class="absolute top-4 right-4 text-white text-3xl" onclick="closeImageModal()">&times;</button>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="fixed inset-0 hidden bg-black bg-opacity-80 flex justify-center items-center z-50">
+  <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+    <h2 class="text-xl font-bold mb-4">Reject KYC</h2>
+    <form method="post" action="{% url 'reject_kyc' service_provider.id %}">
+      {% csrf_token %}
+      <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Rejection</label>
+      <textarea id="reason" name="reason" rows="4" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter reason here..." required></textarea>
+      <div class="flex justify-end space-x-4 mt-4">
+        <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  function showImageModal(imageUrl) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = imageUrl;
+    modal.classList.remove('hidden');
+  }
+
+  function closeImageModal() {
+    document.getElementById('imageModal').classList.add('hidden');
+  }
+
+  function openRejectModal() {
+    document.getElementById('rejectModal').classList.remove('hidden');
+  }
+
+  function closeRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+  }
+</script>
+{% endblock %}

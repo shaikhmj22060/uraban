@@ -1,0 +1,44 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<div class="max-w-4xl mt-14 mx-auto p-8 bg-white rounded-lg shadow-lg">
+  <h1 class="text-3xl font-bold mb-6 text-center">KYC History</h1>
+
+  {% if kyc_records %}
+  <table class="min-w-full bg-white border border-gray-200">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 border-b">User</th>
+        <th class="py-2 px-4 border-b">Status</th>
+        <th class="py-2 px-4 border-b">Reason</th>
+        <th class="py-2 px-4 border-b">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in kyc_records %}
+      <tr>
+        <td class="py-2 px-4 border-b">{{ record.user.username }}</td>
+        <td class="py-2 px-4 border-b">
+          {% if record.status == 'approved' %}
+            <span class="text-green-500 font-semibold">Approved</span>
+          {% else %}
+            <span class="text-red-500 font-semibold">Rejected</span>
+          {% endif %}
+        </td>
+        <td class="py-2 px-4 border-b">
+          {% if record.status == 'rejected' %}
+            {{ record.reason }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td class="py-2 px-4 border-b">{{ record.created_at|date:"F j, Y, g:i a" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-center text-gray-500">No KYC records found.</p>
+  {% endif %}
+</div>
+{% endblock %}

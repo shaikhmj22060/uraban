@@ -1,29 +1,45 @@
+from django.http import JsonResponse
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from .models import *
 from .forms import *
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from service_provider.models import *
 
 # Create your views here.
 
 # category view section
+
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+login_required
+@user_passes_test(is_admin)
 def dashboard(request):
     return render(request, 'dashboard/dashboard.html')
 
+login_required
+@user_passes_test(is_admin)
 def admin_profile(request):
     return render(request, 'dashboard/admin_profile.html')
 
+login_required
+@user_passes_test(is_admin)
 def all_users_view(request):
     users = custom_user.objects.all()
     return render(request, 'dashboard/users.html', {'users': users})
 
 
+login_required
+@user_passes_test(is_admin)
 def view_category(request):
     data = Category.objects.all()
     sub_data = subcatagory.objects.all()
     return render(request, 'dashboard/category.html',{'data':data,'sub_data':sub_data})
 
 
+login_required
+@user_passes_test(is_admin)
 def edit_category(request, id):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -35,7 +51,9 @@ def edit_category(request, id):
         return redirect('view_category')
     else:
       return HttpResponse(request,"errrrr")
-    
+
+login_required
+@user_passes_test(is_admin)    
 def create_category(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -44,13 +62,17 @@ def create_category(request):
         return redirect('view_category')
     else:
         return HttpResponse(request,"errrrr")
-    
+
+login_required
+@user_passes_test(is_admin)    
 def delete_category(request,id):
     # if request.method == 'POST':
         data = Category.objects.get(id=id)
         data.delete()
         return redirect('view_category')
 
+login_required
+@user_passes_test(is_admin)
 def edit_sub(request, id):
     if request.method == 'POST':
         # Get form data
@@ -78,6 +100,8 @@ def edit_sub(request, id):
     return redirect('view_category')  # Replace 'subcategory_list' with your actual URL name
 
 
+login_required
+@user_passes_test(is_admin)
 def create_sub(request):
     if request.method == 'POST':
         # Get form data
@@ -98,6 +122,9 @@ def create_sub(request):
 
         # Redirect to a success page or the subcategory list
         return redirect('view_category')
+
+login_required
+@user_passes_test(is_admin)    
 def delete_sub(request, id):
     # Fetch the SubCategory object to delete
     data = get_object_or_404(subcatagory, id=id)
@@ -108,11 +135,15 @@ def delete_sub(request, id):
 
 # service view section
 
+login_required
+@user_passes_test(is_admin)
 def view_service(request):
     services = service.objects.all()
     subcategories = subcatagory.objects.all()
     return render(request, 'dashboard/services.html', {'services': services, 'subcategories': subcategories})
 
+login_required
+@user_passes_test(is_admin)
 def create_service(request):
     if request.method == 'POST':
         # Get data from the request
@@ -139,6 +170,8 @@ def create_service(request):
     subcategories = subcatagory.objects.all()
     return render(request, 'add_service.html', {'subcategories': subcategories})
 
+login_required
+@user_passes_test(is_admin)
 def edit_service(request, id):
     services = get_object_or_404(service, id=id)
     if request.method == 'POST':
@@ -167,6 +200,8 @@ def edit_service(request, id):
     subcategories = subcatagory.objects.all()
     return render(request, 'edit_service.html', {'service': services, 'subcategories': subcategories})
 
+login_required
+@user_passes_test(is_admin)
 def delete_service(request, id):
     services = get_object_or_404(service, id=id)
     services.delete()
@@ -174,9 +209,19 @@ def delete_service(request, id):
 
 
 
-@login_required
+
+
+login_required
+@user_passes_test(is_admin)
 def profile_view(request):
-    user = request.user  # Get the logged-in user
+    user = request.user
+    template_name = "dashboard/admin_profile.html"
+    redirect_url = "profile"
+
+    # Check if the request is for the service provider profile
+    if request.resolver_match.url_name == "s_profile":
+        template_name = "service_provider/s_profile.html"
+        redirect_url = "s_profile"
 
     if request.method == "POST":
         name = request.POST.get("name", user.username)
@@ -188,20 +233,27 @@ def profile_view(request):
         user.email = email
 
         if profile_image:
-            user.profile_image = profile_image  # Save new profile image if uploaded
+            user.profile_image = profile_image
 
         user.save()
         messages.success(request, "Profile updated successfully!")
-        return redirect("profile")  # Redirect back to profile page after update
 
-    return render(request, "dashboard/admin_profile.html", {"user": user})
+        # Redirect to the respective dashboard
+        return redirect(redirect_url)
+
+    return render(request, template_name, {"user": user})
 
 
+
+login_required
+@user_passes_test(is_admin)
 def users_by_roles(request):
     role = request.GET.get('role', 'client')
     users = custom_user.objects.filter(role=role)
     return render(request, 'dashboard/roles.html', {'users': users})
 
+login_required
+@user_passes_test(is_admin)
 def create_admin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -229,3 +281,78 @@ def create_admin(request):
         return redirect('roles')
     
     return redirect('roles')
+
+login_required
+@user_passes_test(is_admin)
+def admin_notifications(request):
+    if not request.user.is_authenticated or request.user.role != 'admin':
+        return JsonResponse({'status': 'error', 'message': 'Access denied.'})
+
+    # Fetch notifications for the logged-in admin
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+    return render(request, 'dashboard/notification.html', {'notifications': notifications})
+
+login_required
+@user_passes_test(is_admin)
+def approve_kyc(request, provider_id):
+    service_provider = get_object_or_404(ServiceProvider, id=provider_id)
+
+    # Create approval record
+    KYCRecord.objects.create(user=service_provider.user, status='approved')
+
+    # Update service provider status
+    service_provider.is_verified = True
+    service_provider.save()
+    Notification.objects.filter(service_provider=service_provider).delete()
+    # Send notification
+    Notification.objects.create(
+        recipient=service_provider.user,
+        message="Congratulations! Your KYC has been approved."
+    )
+
+    messages.success(request, "KYC approved successfully.")
+    return redirect('admin_notifications')
+
+
+# Reject KYC
+
+login_required
+@user_passes_test(is_admin)
+def reject_kyc(request, provider_id):
+    service_provider = get_object_or_404(ServiceProvider, id=provider_id)
+    reason = request.POST.get('reason')
+
+    if not reason:
+        messages.error(request, "Rejection reason is required.")
+        return redirect('review_kyc', service_provider_id=provider_id)
+
+    # Create rejection record with reason
+    KYCRecord.objects.create(user=service_provider.user, status='rejected', reason=reason)
+
+    # Delete the KYC data from the ServiceProvider model
+    service_provider.delete()
+    
+    # Delete notifications using provider_id
+    Notification.objects.filter(service_provider_id=provider_id).delete()
+
+    # Send notification to the user
+    Notification.objects.create(
+        recipient=service_provider.user,
+        message=f"Your KYC has been rejected. Reason: {reason}"
+    )
+
+    messages.success(request, "KYC rejected successfully.")
+    return redirect('admin_notifications')
+
+login_required
+@user_passes_test(is_admin)
+def review_kyc(request, provider_id):
+    service_provider = get_object_or_404(ServiceProvider, id=provider_id)
+    return render(request, 'dashboard/review_kyc.html', {'service_provider': service_provider})
+
+
+login_required
+@user_passes_test(is_admin)
+def kyc_history(request):
+    kyc_records = KYCRecord.objects.all().order_by('-created_at')
+    return render(request, 'dashboard/kyc_history.html', {'kyc_records': kyc_records})
