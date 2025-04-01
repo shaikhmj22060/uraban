@@ -22,28 +22,18 @@
 
                     <!-- Increase / Decrease Buttons -->
                     <div class="flex items-center space-x-2">
-                        {% if item.service_id %}
-                            <a href="{% url 'decrease_quantity' item.service_id %}" 
-                               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">−</a>
-                        {% else %}
-                            <span class="text-red-500">Invalid ID</span>
-                        {% endif %}
+                        <a href="{% url 'decrease_quantity' item.service.id %}" 
+                           class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">−</a>
 
                         <span class="text-lg font-semibold">{{ item.quantity|default:"0" }}</span>
 
-                        {% if item.service_id %}
-                            <a href="{% url 'increase_quantity' item.service_id %}" 
-                               class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600">+</a>
-                        {% endif %}
+                        <a href="{% url 'increase_quantity' item.service.id %}" 
+                           class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600">+</a>
                     </div>
 
                     <!-- Remove from Cart -->
-                    {% if item.service_id %}
-                        <a href="{% url 'remove_from_cart' item.service_id %}" 
-                           class="bg-red-700 text-white px-3 py-1 rounded-lg hover:bg-red-800">Remove</a>
-                    {% else %}
-                        <span class="text-red-500">Cannot remove</span>
-                    {% endif %}
+                    <a href="{% url 'remove_from_cart' item.service.id %}" 
+                       class="bg-red-700 text-white px-3 py-1 rounded-lg hover:bg-red-800">Remove</a>
                 </div>
             {% endfor %}
         {% else %}
@@ -58,7 +48,9 @@
                     {% csrf_token %}
                     <button class="mt-4 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-700">Clear Cart</button>
                 </form>
-                <button class="mt-4 bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800">Proceed to Checkout</button>
+                <a href="{% url 'checkout' %}">
+                    <button class="mt-4 bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800">Proceed to Checkout</button>
+                </a>
             {% endif %}
         </div>
     </div>

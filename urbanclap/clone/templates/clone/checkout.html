@@ -1,0 +1,42 @@
+{% extends "navbar.html" %}
+{% block main %}
+<div class="container mx-auto py-10">
+  <h2 class="text-3xl font-bold mb-6">Checkout</h2>
+  
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <table class="w-full border">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Quantity</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+        <tr>
+          <td>{{ item.service.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ item.service.price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="text-xl font-semibold">Total: ₹{{ total_amount }}</p>
+
+    <label class="block">
+      Service Date:
+      <input type="date" name="service_date" required class="border p-2 rounded">
+    </label>
+
+    <label class="block">
+      Service Time:
+      <input type="time" name="service_time" required class="border p-2 rounded">
+    </label>
+
+    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded">Proceed to Payment</button>
+  </form>
+</div>
+{% endblock %}

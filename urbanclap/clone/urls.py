@@ -19,4 +19,10 @@ urlpatterns = [
     path('cart/clear/', clear_cart, name='clear_cart'),
     path('cart/increase/<int:service_id>/', increase_quantity, name='increase_quantity'),
     path('cart/decrease/<int:service_id>/', decrease_quantity, name='decrease_quantity'),
+    
+    #checkout & payment
+    
+    path('checkout/', checkout_view, name='checkout'),
+    path('payment-success/', payment_success_view, name='payment_success'),
+    path('bookings/', client_bookings, name='client_bookings'),
 ]

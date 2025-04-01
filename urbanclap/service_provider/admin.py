@@ -6,3 +6,5 @@ admin.site.register(ServiceProvider)
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['recipient', 'service_provider', 'message', 'created_at', 'is_read']
+
+admin.site.register(ServiceBooking)

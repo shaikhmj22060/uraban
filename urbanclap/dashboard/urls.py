@@ -19,7 +19,7 @@ urlpatterns = [
     
     # service urls
     path('service/', view_service, name = 'view_service'),
-     path('services/create/', create_service, name='createservice'),
+    path('services/create/', create_service, name='createservice'),
     path('services/edit/<int:id>/', edit_service, name='editservice'),
     path('services/delete/<int:id>/', delete_service, name='deleteservice'),
     

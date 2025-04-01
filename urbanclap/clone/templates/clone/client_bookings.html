@@ -1,0 +1,41 @@
+{% extends "navbar.html" %}
+{% block main %}
+
+<section class="py-12 px-6">
+    <h1 class="text-3xl font-bold mb-6">Your Bookings</h1>
+
+    {% if bookings %}
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 px-4 py-2">Service</th>
+                    <th class="border border-gray-300 px-4 py-2">Service Provider</th>
+                    <th class="border border-gray-300 px-4 py-2">Service Date</th>
+                    <th class="border border-gray-300 px-4 py-2">Service Time</th>
+                    <th class="border border-gray-300 px-4 py-2">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">{{ booking.service.name }}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {% if booking.service_provider %}
+                            {{ booking.service_provider.user.name }} ({{ booking.service_provider.category }})
+                        {% else %}
+                            Not Assigned
+                        {% endif %}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ booking.service_date }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ booking.service_time }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ booking.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-gray-500">You have no bookings yet.</p>
+    {% endif %}
+</section>
+
+{% endblock %}

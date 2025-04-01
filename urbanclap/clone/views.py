@@ -1,8 +1,12 @@
+from django.contrib import messages
+
 from django.shortcuts import get_object_or_404, render,redirect
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from dashboard.models import *
+from service_provider.models import *
+import stripe
 # Create your views here.
 
 def is_client(user):
@@ -40,9 +44,9 @@ def register(request):
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-        role = request.POST['role']
         
-        user = custom_user.objects.create_user(username=username, email=email, password=password, role=role)
+        
+        user = custom_user.objects.create_user(username=username, email=email, password=password)
         user.save()
         login(request, user)
         return redirect('home')  # Redirect after login
@@ -150,3 +154,84 @@ def remove_from_cart(request, service_id):
 def clear_cart(request):
     Cart.objects.filter(user=request.user).delete()
     return redirect('cart_view')
+
+
+
+# Initialize Stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+def checkout_view(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_amount = sum(item.service.price * item.quantity for item in cart_items)
+
+    if request.method == 'POST':
+        service_date = request.POST.get('service_date')
+        service_time = request.POST.get('service_time')
+
+        if not service_date or not service_time:
+            messages.error(request, "Please select a valid service date and time.")
+            return redirect('checkout')
+
+        # Create Payment Intent
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=int(total_amount * 100),  # Convert to cents
+                currency="inr",
+                metadata={"user_id": request.user.id}
+            )
+            request.session['service_date'] = service_date
+            request.session['service_time'] = service_time
+            request.session['payment_intent_id'] = intent['id']
+            return render(request, 'clone/payment.html', {
+                'cart_items': cart_items,
+                'total_amount': total_amount,
+                'client_secret': intent.client_secret
+            })
+        except Exception as e:
+            messages.error(request, f"Payment Error: {e}")
+            return redirect('checkout')
+
+    return render(request, 'clone/checkout.html', {
+        'cart_items': cart_items,
+        'total_amount': total_amount
+    })
+
+def payment_success_view(request):
+    payment_intent_id = request.session.get('payment_intent_id')
+    service_date = request.session.get('service_date')
+    service_time = request.session.get('service_time')
+
+    if not payment_intent_id:
+        messages.error(request, "Payment session not found.")
+        return redirect('checkout')
+
+    try:
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+
+        if payment_intent.status == 'succeeded':
+            # Create service bookings
+            cart_items = Cart.objects.filter(user=request.user)
+            for item in cart_items:
+                ServiceBooking.objects.create(
+                    client=request.user,
+                    service=item.service,
+                    service_date=service_date,
+                    service_time=service_time
+                )
+            # Clear cart
+            cart_items.delete()
+
+            messages.success(request, "Payment successful! Booking confirmed.")
+            return redirect('client_bookings')
+        else:
+            messages.error(request, "Payment not successful. Please try again.")
+            return redirect('checkout')
+    except Exception as e:
+        messages.error(request, f"Error: {e}")
+        return redirect('checkout')
+    
+
+def client_bookings(request):
+    bookings = ServiceBooking.objects.filter(client=request.user).order_by('-booking_date')
+    return render(request, 'clone/client_bookings.html', {'bookings': bookings})
+

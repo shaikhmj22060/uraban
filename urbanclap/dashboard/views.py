@@ -48,7 +48,7 @@ def edit_category(request, id):
         data.name = name
         data.image = image
         data.save()
-        return redirect('view_category')
+        return redirect('category')
     else:
       return HttpResponse(request,"errrrr")
 
@@ -59,7 +59,7 @@ def create_category(request):
         name = request.POST.get('name')
         image = request.FILES.get('image')
         data = Category.objects.create(name=name, image=image)
-        return redirect('view_category')
+        return redirect('category')
     else:
         return HttpResponse(request,"errrrr")
 
@@ -69,7 +69,7 @@ def delete_category(request,id):
     # if request.method == 'POST':
         data = Category.objects.get(id=id)
         data.delete()
-        return redirect('view_category')
+        return redirect('category')
 
 login_required
 @user_passes_test(is_admin)
@@ -97,7 +97,7 @@ def edit_sub(request, id):
         data.save()
 
     # Redirect to a success page or the subcategory list
-    return redirect('view_category')  # Replace 'subcategory_list' with your actual URL name
+    return redirect('category')  # Replace 'subcategory_list' with your actual URL name
 
 
 login_required
@@ -121,7 +121,7 @@ def create_sub(request):
         subcategory.save()
 
         # Redirect to a success page or the subcategory list
-        return redirect('view_category')
+        return redirect('category')
 
 login_required
 @user_passes_test(is_admin)    
@@ -131,7 +131,7 @@ def delete_sub(request, id):
     # Delete the object
     data.delete()
     # Redirect to the subcategory list
-    return redirect('view_category')  # Replace 'subcategory_list' with your actual URL name
+    return redirect('category')  # Replace 'subcategory_list' with your actual URL name
 
 # service view section
 

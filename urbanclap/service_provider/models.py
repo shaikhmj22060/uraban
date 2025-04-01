@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from dashboard.models import *
 from django.conf import settings
 from django.utils.timezone import now
@@ -6,6 +7,7 @@ from django.utils.timezone import now
 
 class ServiceProvider(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
@@ -45,3 +47,49 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.recipient.username}"
+    
+
+class ServiceBooking(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('assigned', 'Assigned'),
+        ('accepted', 'Accepted'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='bookings',
+        limit_choices_to={'role': 'client'}
+    )
+    service = models.ForeignKey('dashboard.Service', on_delete=models.CASCADE)
+    service_provider = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_services',
+        limit_choices_to={'role': 'service_provider'}
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    booking_date = models.DateTimeField(auto_now_add=True)
+    service_date = models.DateField()
+    service_time = models.TimeField()
+
+    def clean(self):
+        # Ensure only clients can book services
+        if self.client.role != 'client':
+            raise ValidationError("Only clients can book services.")
+
+        # Ensure only service providers can be assigned
+        if self.service_provider and self.service_provider.role != 'service_provider':
+            raise ValidationError("Only service providers can be assigned to a service.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(ServiceBooking, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Booking {self.id} - {self.service.name} - {self.status}"

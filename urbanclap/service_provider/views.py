@@ -29,6 +29,7 @@ def kyc (request):
 
 def service_provider_register(request):
     if request.method == 'POST':
+        name = request.POST.get('name')
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -42,7 +43,7 @@ def service_provider_register(request):
             return JsonResponse({'status': 'error', 'message': 'Email already exists. Please use a different one.'})
 
         # Create user and service provider
-        user = User.objects.create_user(username=username, email=email, password=password)
+        user = User.objects.create_user(username=username, email=email, password=password,name=name)
         user.role = 'service_provider'
         if profile_image:
             user.profile_image = profile_image
