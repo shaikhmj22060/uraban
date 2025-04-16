@@ -1,0 +1,50 @@
+{% extends "comman.html" %}
+
+{% block main %}
+<div class="container mx-auto p-6">
+    <h2 class="text-3xl font-bold mb-6">Admin Panel - Service Bookings</h2>
+
+    {% if pending_bookings %}
+        <div class="bg-white p-6 shadow-lg rounded-lg">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-3 text-left">Service</th>
+                        <th class="p-3 text-left">Client</th>
+                        <th class="p-3 text-left">Date</th>
+                        <th class="p-3 text-left">Time</th>
+                        <th class="p-3 text-left">Assign Provider</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in pending_bookings %}
+                    <tr class="border-b">
+                        <td class="p-3">{{ booking.service.name }}</td>
+                        <td class="p-3">{{ booking.client.username }}</td>
+                        <td class="p-3">{{ booking.service_date }}</td>
+                        <td class="p-3">{{ booking.service_time }}</td>
+                        <td class="p-3">
+                            <form method="POST" action="{% url 'assign_provider' booking.id %}">
+                                {% csrf_token %}
+                                <select name="provider_id" class="border p-2 rounded">
+                                    {% for provider in eligible_providers %}
+                                        {% if provider.cat == booking.service.category %}
+                                            <option value="{{ provider.id }}">{{ provider.user }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    Assign
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center text-gray-500">No pending bookings.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+<!-- templates/send_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Email</title>
+</head>
+<body>
+    <h2>Click the button to send a test email</h2>
+    <form action="{% url 'send_email' %}" method="get">
+        <button type="submit">Send Email</button>
+    </form>
+</body>
+</html>

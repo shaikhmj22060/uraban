@@ -1,8 +1,8 @@
 {% extends "navbar.html" %}
 {% block main %}
 
-<section class="py-12 px-6">
-    <h1 class="text-3xl font-bold mb-6">Your Bookings</h1>
+<section class="py-12 px-6 my-16 h-screen">
+    <h1 class="text-3xl font-bold mb-6">My Bookings</h1>
 
     {% if bookings %}
         <table class="w-full border-collapse border border-gray-300">
@@ -21,7 +21,7 @@
                     <td class="border border-gray-300 px-4 py-2">{{ booking.service.name }}</td>
                     <td class="border border-gray-300 px-4 py-2">
                         {% if booking.service_provider %}
-                            {{ booking.service_provider.user.name }} ({{ booking.service_provider.category }})
+                            {{ booking.service_provider.username }} ({{ booking.service_provider.cat }})
                         {% else %}
                             Not Assigned
                         {% endif %}

@@ -31,4 +31,9 @@ urlpatterns = [
     
     
     path('kyc-history/', kyc_history, name='kyc_history'),
+    
+    path('assign-provider/<int:booking_id>/', assign_provider, name='assign_provider'),
+    path('service-request/', booking_requests, name='service_request'),
+    path("send-test-email/", email_test_page, name="send_test_email"),
+    path('send-email/', send_test_email, name='send_email'),
 ]

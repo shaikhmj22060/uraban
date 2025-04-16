@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notification Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 30px; }
+        #notifications-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column-reverse; /* Newest notifications on top */
+            gap: 10px;
+            max-width: 400px;
+        }
+        .notification {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        }
+        .notification-close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            color: #666;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome, {{ request.user.username }}</h2>
+
+    <button onclick="sendTestNotification()">Send Test Notification</button>
+
+    <div id="notifications-container"></div>
+
+    <script>
+        const userId = '{{ request.user.id }}';
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const socket = new WebSocket(`${wsScheme}://${window.location.host}/ws/notifications/${userId}/`);
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            createNotificationElement(data);
+        };
+
+        function createNotificationElement(notification) {
+            const container = document.getElementById('notifications-container');
+            
+            // Create notification div
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = 'notification';
+            
+            // Add close button
+            const closeButton = document.createElement('span');
+            closeButton.className = 'notification-close';
+            closeButton.innerHTML = '×';
+            closeButton.onclick = () => notificationDiv.remove();
+            
+            // Add content
+            const title = document.createElement('h3');
+            title.textContent = notification.title;
+            
+            const body = document.createElement('p');
+            body.textContent = notification.body;
+            
+            // Assemble elements
+            notificationDiv.appendChild(closeButton);
+            notificationDiv.appendChild(title);
+            notificationDiv.appendChild(body);
+            
+            // Add to container (newest on top)
+            container.insertBefore(notificationDiv, container.firstChild);
+        }
+
+        socket.onopen = () => console.log("WebSocket connected");
+        socket.onclose = () => console.log("WebSocket disconnected");
+
+        function sendTestNotification() {
+            fetch(`/service_provider/send-notification/${userId}/`)
+                .then(response => response.json())
+                .then(console.log);
+        }
+    </script>
+</body>
+</html>

@@ -12,10 +12,21 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+#celery config 
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -58,8 +69,8 @@ CHANNEL_LAYERS = {
     },
 }
 
-STRIPE_SECRET_KEY = 'sk_test_51R8H48PiKaFFl6X4tYGwEYJIUaWpsdldti1dwf2ydyyUYpGvdhVXrGIgoFeFR1DhoZKDwy8L0S37Y988uKBnhOx800UCoiHnRU'
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51R8H48PiKaFFl6X4usvI5LWxoMnqFGPvt5gIzfiLtBLEOuQDd8bAD2wrBCUUT1yI6ovCZfpSuDHUwDBODWZ2oOqD00tZM2uNpu'
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
 
 
 TAILWIND_APP_NAME = 'theme'
@@ -76,7 +87,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'urbanclap.urls'
 
@@ -160,3 +173,12 @@ LOGIN_URL = 'login_user'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login_user'
 
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env("EMAIL_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_PASS")

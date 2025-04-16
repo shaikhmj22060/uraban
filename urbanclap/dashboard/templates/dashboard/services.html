@@ -21,6 +21,7 @@
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-center">Service Name</th>
+                        <th scope="col" class="px-6 py-3 text-center">Category</th>
                         <th scope="col" class="px-6 py-3 text-center">Subcategory</th>
                         <th scope="col" class="px-6 py-3 text-center">Image</th>
                         <th scope="col" class="px-6 py-3 text-center">Price</th>
@@ -31,6 +32,7 @@
                     {% for service in services %}
                     <tr class="bg-white border-b hover:bg-gray-50">
                         <td class="px-6 py-4 font-medium text-gray-900 text-center">{{ service.name }}</td>
+                        <td class="px-6 py-4 text-center">{{ service.category.name }}</td>
                         <td class="px-6 py-4 text-center">{{ service.subcatagory.name }}</td>
                         <td class="px-6 py-4 text-center">
                             <img src="{{ service.image.url }}" alt="{{ service.name }}" class="w-20 h-20 object-cover rounded-lg shadow-sm mx-auto">
@@ -78,6 +80,14 @@
                                             <select id="subcategory{{ service.id }}" name="subcatagory" class="mt-1 p-2 w-full border rounded-md" required>
                                                 {% for sub in subcategories %}
                                                 <option value="{{ sub.id }}" {% if sub.id == service.subcatagory.id %}selected{% endif %}>{{ sub.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="category{{ service.id }}" class="block text-sm font-medium text-gray-900">Subcategory</label>
+                                            <select id="subcategory{{ service.id }}" name="category" class="mt-1 p-2 w-full border rounded-md" required>
+                                                {% for cat in categories %}
+                                                <option value="{{ cat.id }}" {% if cat.id == service.catagory.id %}selected{% endif %}>{{ cat.name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -135,6 +145,14 @@
                     <div class="mb-4">
                         <label for="serviceName" class="block text-sm font-medium text-gray-900">Service Name</label>
                         <input type="text" name="name" id="serviceName" class="mt-1 p-2 w-full border rounded-md" placeholder="Enter service name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="category" class="block text-sm font-medium text-gray-900">Category</label>
+                        <select id="category" name="category" class="mt-1 p-2 w-full border rounded-md" required>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-4">
                         <label for="subcategory" class="block text-sm font-medium text-gray-900">Subcategory</label>

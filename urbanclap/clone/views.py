@@ -167,7 +167,7 @@ def checkout_view(request):
     if request.method == 'POST':
         service_date = request.POST.get('service_date')
         service_time = request.POST.get('service_time')
-
+        address = request.POST.get('address')
         if not service_date or not service_time:
             messages.error(request, "Please select a valid service date and time.")
             return redirect('checkout')
@@ -181,6 +181,7 @@ def checkout_view(request):
             )
             request.session['service_date'] = service_date
             request.session['service_time'] = service_time
+            request.session['address'] = address
             request.session['payment_intent_id'] = intent['id']
             return render(request, 'clone/payment.html', {
                 'cart_items': cart_items,
@@ -200,6 +201,7 @@ def payment_success_view(request):
     payment_intent_id = request.session.get('payment_intent_id')
     service_date = request.session.get('service_date')
     service_time = request.session.get('service_time')
+    address = request.session.get('address')
 
     if not payment_intent_id:
         messages.error(request, "Payment session not found.")
@@ -216,7 +218,8 @@ def payment_success_view(request):
                     client=request.user,
                     service=item.service,
                     service_date=service_date,
-                    service_time=service_time
+                    service_time=service_time,
+                    address=address,
                 )
             # Clear cart
             cart_items.delete()

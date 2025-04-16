@@ -5,6 +5,9 @@ from .forms import *
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from service_provider.models import *
+from django.core.mail import send_mail
+from django.conf import settings 
+from dashboard.task import send_email_task
 
 # Create your views here.
 
@@ -140,7 +143,8 @@ login_required
 def view_service(request):
     services = service.objects.all()
     subcategories = subcatagory.objects.all()
-    return render(request, 'dashboard/services.html', {'services': services, 'subcategories': subcategories})
+    categories = Category.objects.all()
+    return render(request, 'dashboard/services.html', {'services': services, 'subcategories': subcategories, 'categories': categories})
 
 login_required
 @user_passes_test(is_admin)
@@ -148,6 +152,7 @@ def create_service(request):
     if request.method == 'POST':
         # Get data from the request
         name = request.POST.get('name')
+        category_id = request.POST.get('category')
         subcatagory_id = request.POST.get('subcatagory')
         image = request.FILES.get('image')
         price = request.POST.get('price')
@@ -155,10 +160,12 @@ def create_service(request):
 
         # Fetch the SubCategory instance
         subcategory = get_object_or_404(subcatagory, id=subcatagory_id)
+        category = get_object_or_404(Category, id=category_id)
 
         # Create and save the new Service
         service.objects.create(
             name=name,
+            category=category,
             subcatagory=subcategory,
             image=image,
             price=price,
@@ -168,7 +175,8 @@ def create_service(request):
     
     # If it's a GET request, fetch subcategories for the dropdown
     subcategories = subcatagory.objects.all()
-    return render(request, 'add_service.html', {'subcategories': subcategories})
+    categories = Category.objects.all()
+    return render(request, 'add_service.html', {'subcategories': subcategories, 'categories': categories})
 
 login_required
 @user_passes_test(is_admin)
@@ -177,6 +185,7 @@ def edit_service(request, id):
     if request.method == 'POST':
         # Get data from the request
         name = request.POST.get('name')
+        category = request.POST.get('category')
         subcatagory_id = request.POST.get('subcatagory')
         image = request.FILES.get('image')
         price = request.POST.get('price')
@@ -187,6 +196,7 @@ def edit_service(request, id):
 
         # Update the Service instance
         services.name = name
+        services.category = category
         services.subcatagory = subcategory
         services.price = price
         services.description = description
@@ -198,7 +208,8 @@ def edit_service(request, id):
     
     # If it's a GET request, fetch subcategories for the dropdown
     subcategories = subcatagory.objects.all()
-    return render(request, 'edit_service.html', {'service': services, 'subcategories': subcategories})
+    categories = Category.objects.all()
+    return render(request, 'edit_service.html', {'service': services, 'subcategories': subcategories,'categories': categories})
 
 login_required
 @user_passes_test(is_admin)
@@ -210,9 +221,8 @@ def delete_service(request, id):
 
 
 
-
 login_required
-@user_passes_test(is_admin)
+# @user_passes_test(is_admin)
 def profile_view(request):
     user = request.user
     template_name = "dashboard/admin_profile.html"
@@ -356,3 +366,40 @@ login_required
 def kyc_history(request):
     kyc_records = KYCRecord.objects.all().order_by('-created_at')
     return render(request, 'dashboard/kyc_history.html', {'kyc_records': kyc_records})
+
+login_required
+@user_passes_test(is_admin)
+def booking_requests(request):
+    pending_bookings = ServiceBooking.objects.filter(status='pending')
+    eligible_providers = ServiceProvider.objects.filter(is_verified='True')
+    
+    return render(request, 'dashboard/service_request_Admin.html', {
+        'pending_bookings': pending_bookings,
+        'eligible_providers': eligible_providers
+    })
+    
+def assign_provider(request, booking_id):
+    if request.method == "POST":
+        provider_id = request.POST.get("provider_id")
+        provider = ServiceProvider.objects.get(id=provider_id)
+        
+        booking = ServiceBooking.objects.get(id=booking_id)
+        booking.service_provider = provider.user
+        booking.status = "assigned"
+        booking.save()
+
+        messages.success(request, "Service assigned successfully.")
+        return redirect('dashboard')
+
+    return redirect('dashboard')
+
+def email_test_page(request):
+    return render(request, "dashboard/email_test.html")
+
+def send_test_email(request):
+     send_email_task.delay(
+        "Welcome!",
+        "This is an async email sent using Celery",
+        ["recipient@example.com"]
+    )
+     return HttpResponse("sent succeses")

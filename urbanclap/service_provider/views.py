@@ -6,11 +6,38 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from dashboard.models import *
 from django.contrib.auth.decorators import login_required, user_passes_test
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 # Create your views here.
 
 
 
 User = get_user_model()
+
+
+@login_required
+def notification_test_view(request):
+    return render(request, 'service_provider/test_notification.html')
+
+
+def send_test_notification(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"user_{user.id}",
+            {
+                "type": "send_notification",
+                "message": {
+                    "title": "Test Notification",
+                    "body": f"Hello {user.username}, this is a test!"
+                }
+            }
+        )
+        return JsonResponse({"success": True})
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"})
 
 def is_service_provider(user):
     return user.is_authenticated and user.role == 'service_provider'
@@ -20,12 +47,10 @@ def is_service_provider(user):
 def Sdashobard(request):
     return render(request, 'service_provider/s_dashboard.html')
 
-@login_required
-@user_passes_test(is_service_provider)
-def kyc (request):
-    categories = Category.objects.all()
-    subcategories = subcatagory.objects.all()
-    return render(request, 'service_provider/KYC.html', {'categories': categories, 'subcategories': subcategories})
+# def kyc (request):
+#     categories = Category.objects.all()
+#     subcategories = subcatagory.objects.all()
+#     return render(request, 'service_provider/KYC.html', {'categories': categories, 'subcategories': subcategories})
 
 def service_provider_register(request):
     if request.method == 'POST':
@@ -139,3 +164,60 @@ def mark_as_read(request, notification_id):
 
     # Redirect to the notifications page
     return redirect('s_notification')
+
+@login_required
+@user_passes_test(is_service_provider)
+def Service_request(request):   
+    service_provider = ServiceProvider.objects.get(user=request.user)
+    
+    # Get bookings for the provider's category & only show pending requests
+    bookings = ServiceBooking.objects.filter(
+        # service_category=service_provider.cat,
+        status='pending'
+    )
+    
+    return render(request, 'service_provider/service_request.html', {'bookings': bookings})
+
+
+@login_required
+@user_passes_test(is_service_provider)
+def kyc(request):
+    user = request.user
+    service_provider = ServiceProvider.objects.filter(user=user).first()
+
+    context = {
+        'service_provider': service_provider,
+        'categories': Category.objects.all(),
+        'subcategories': subcatagory.objects.all(),
+        'kyc_submitted': bool(service_provider),  # True if KYC submitted
+        'kyc_verified': service_provider.is_verified if service_provider else False  # True if KYC approved
+    }
+
+    return render(request, 'service_provider/KYC.html', context)
+
+
+def accept_service(request, booking_id):
+    user = request.user
+    service_provider = get_object_or_404(ServiceProvider, user=user)
+
+    if not service_provider.is_verified:
+        messages.error(request, "Your KYC is not yet approved. You cannot accept services.")
+        return redirect('service_provider_dashboard')
+
+    booking = get_object_or_404(ServiceBooking, id=booking_id)
+
+    if booking.service_provider:
+        messages.warning(request, "This service has already been accepted or assigned.")
+        return redirect('s_booking_request')
+
+    # Optional: check category match if needed
+    if booking.service.category != service_provider.cat:
+        messages.error(request, "You cannot accept this service. It does not match your category.")
+        return redirect('s_booking_request')
+
+    booking.service_provider = user
+    booking.status = "accepted"
+    booking.save()
+
+    messages.success(request, "You have successfully accepted the service.")
+    return redirect('s_booking_request')

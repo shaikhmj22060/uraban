@@ -2,8 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings 
 from django.contrib.auth.models import AbstractUser 
-from service_provider.models import *
-from service_provider.models import ServiceBooking
+
 # Create your models here.
 
 class Category(models.Model):
@@ -25,6 +24,7 @@ class subcatagory(models.Model):
         return self.name
     
 class service(models.Model):
+    category = models.ForeignKey(Category, on_delete = models.CASCADE, default = None)
     subcatagory = models.ForeignKey(subcatagory, on_delete = models.CASCADE)
     name = models.CharField(max_length = 100)
     image = models.ImageField(upload_to = 'media/service')
@@ -73,7 +73,7 @@ class KYCRecord(models.Model):
 
 class Payment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    booking = models.OneToOneField(ServiceBooking, on_delete=models.CASCADE)
+    booking = models.OneToOneField('service_provider.ServiceBooking', on_delete=models.CASCADE)
     stripe_payment_intent_id = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')], default='pending')
     amount = models.DecimalField(max_digits=10, decimal_places=2)

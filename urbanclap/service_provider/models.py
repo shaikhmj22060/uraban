@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ValidationError
-from dashboard.models import *
+
 from django.conf import settings
 from django.utils.timezone import now
 
@@ -39,7 +39,7 @@ class Notification(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications'
     )
     service_provider = models.ForeignKey(
-        'ServiceProvider', on_delete=models.CASCADE, null=True, blank=True
+        'service_provider.ServiceProvider', on_delete=models.CASCADE, null=True, blank=True
     )
     message = models.TextField()
     created_at = models.DateTimeField(default=now)
@@ -64,7 +64,7 @@ class ServiceBooking(models.Model):
         related_name='bookings',
         limit_choices_to={'role': 'client'}
     )
-    service = models.ForeignKey('dashboard.Service', on_delete=models.CASCADE)
+    service = models.ForeignKey('dashboard.service', on_delete=models.CASCADE)
     service_provider = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -77,6 +77,7 @@ class ServiceBooking(models.Model):
     booking_date = models.DateTimeField(auto_now_add=True)
     service_date = models.DateField()
     service_time = models.TimeField()
+    address = models.TextField(max_length=48,blank=False,null=False)
 
     def clean(self):
         # Ensure only clients can book services
