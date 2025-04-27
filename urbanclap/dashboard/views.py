@@ -7,7 +7,7 @@ from django.contrib import messages
 from service_provider.models import *
 from django.core.mail import send_mail
 from django.conf import settings 
-from dashboard.task import send_email_task
+from dashboard.tasks import send_email_task
 
 # Create your views here.
 

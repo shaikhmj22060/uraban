@@ -11,7 +11,9 @@ urlpatterns = [
     
     
     path('service',service_page,name='service'),
-    path('search/', search_service, name='search_service'),
+    # path('search/', search_service, name='search_service'),
+    path('api/search-suggestions/', search_service, name='search_service'),
+    
     # path('cart',cart,name='cart'),
      path('cart/', cart_view, name='cart_view'),
     path('cart/add/<int:service_id>/', add_to_cart, name='add_to_cart'),
@@ -25,4 +27,7 @@ urlpatterns = [
     path('checkout/', checkout_view, name='checkout'),
     path('payment-success/', payment_success_view, name='payment_success'),
     path('bookings/', client_bookings, name='client_bookings'),
+    
+    #feedBack
+      path('feedback/<int:booking_id>/', feedback_view, name='feedback_page'),
 ]

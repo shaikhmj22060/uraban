@@ -1,41 +1,227 @@
 {% extends "navbar.html" %}
 {% block main %}
-
-<section class="py-12 px-6 my-16 h-screen">
-    <h1 class="text-3xl font-bold mb-6">My Bookings</h1>
-
-    {% if bookings %}
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2">Service</th>
-                    <th class="border border-gray-300 px-4 py-2">Service Provider</th>
-                    <th class="border border-gray-300 px-4 py-2">Service Date</th>
-                    <th class="border border-gray-300 px-4 py-2">Service Time</th>
-                    <th class="border border-gray-300 px-4 py-2">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in bookings %}
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">{{ booking.service.name }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        {% if booking.service_provider %}
-                            {{ booking.service_provider.username }} ({{ booking.service_provider.cat }})
-                        {% else %}
-                            Not Assigned
-                        {% endif %}
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2">{{ booking.service_date }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ booking.service_time }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ booking.get_status_display }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="text-gray-500">You have no bookings yet.</p>
-    {% endif %}
+<section class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 my-8">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="border-b border-gray-200 p-6 bg-gradient-to-r from-blue-500 to-blue-700">
+            <h1 class="text-3xl font-bold text-white">My Bookings</h1>
+        </div>
+        
+        <div class="p-6">
+            {% if bookings %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service Provider</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for booking in bookings %}
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-medium text-gray-900">{{ booking.service.name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if booking.service_provider %}
+                                        <button 
+                                            onclick="openModal('modal-{{ forloop.counter }}')" 
+                                            class="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                                        >
+                                            <span class="font-medium">{{ booking.service_provider.username }}</span>
+                                            <span class="ml-1 text-sm text-gray-500">({{ booking.service_provider.cat.name }})</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </button>
+                                        
+                                        <!-- Modal -->
+                                        <div id="modal-{{ forloop.counter }}" class="provider-modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
+                                                <div class="flex justify-between items-center mb-4">
+                                                    <h2 class="text-xl font-semibold text-gray-800">Service Provider Details</h2>
+                                                    <button onclick="closeModal('modal-{{ forloop.counter }}')" class="text-gray-500 hover:text-gray-700">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="grid grid-cols-1 gap-3 mb-4">
+                                                    <div class="p-3 border rounded bg-gray-50">
+                                                        <p class="text-sm text-gray-500">Username</p>
+                                                        <p class="font-medium">{{ booking.service_provider.username }}</p>
+                                                    </div>
+                                                    <div class="p-3 border rounded bg-gray-50">
+                                                        <p class="text-sm text-gray-500">Name</p>
+                                                        <p class="font-medium">{{ booking.service_provider.name }}</p>
+                                                    </div>
+                                                    <div class="p-3 border rounded bg-gray-50">
+                                                        <p class="text-sm text-gray-500">Phone Number</p>
+                                                        <p class="font-medium">{{ booking.service_provider.phone }}</p>
+                                                    </div>
+                                                    <div class="p-3 border rounded bg-gray-50">
+                                                        <p class="text-sm text-gray-500">Verification Status</p>
+                                                        <div class="flex items-center">
+                                                            {% if booking.service_provider.is_verified %}
+                                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                                    </svg>
+                                                                    Verified
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                    </svg>
+                                                                    Not Verified
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-3 border rounded bg-gray-50">
+                                                        <p class="text-sm text-gray-500">Certificate</p>
+                                                        <div class="mt-1">
+                                                            {% if booking.service_provider.certificate %}
+                                                                <a href="{{ booking.service_provider.certificate.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 inline-flex items-center">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                    </svg>
+                                                                    View Certificate
+                                                                </a>
+                                                            {% else %}
+                                                                <span class="text-gray-500">Not Uploaded</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="flex justify-end">
+                                                    <button 
+                                                        onclick="closeModal('modal-{{ forloop.counter }}')" 
+                                                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                                    >
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            Not Assigned
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-gray-900">{{ booking.service_date }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-gray-900">{{ booking.service_time }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if booking.get_status_display == "Completed" %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    {% elif booking.get_status_display == "Cancelled" %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    {% elif booking.get_status_display == "Pending" %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    {% elif booking.get_status_display == "Confirmed" %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex space-x-2">
+                                        <button class="text-gray-600 hover:text-blue-600 transition-colors" title="View Details">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                        {% if booking.get_status_display == "Pending" or booking.get_status_display == "Confirmed" %}
+                                            <button class="text-gray-600 hover:text-red-600 transition-colors" title="Cancel Booking">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        {% endif %}
+                                        {% if booking.get_status_display == "Completed" %}
+                                            <button class="text-gray-600 hover:text-yellow-600 transition-colors" title="Leave Review">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                                </svg>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="py-12 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-700 mb-2">No Bookings Yet</h3>
+                    <p class="text-gray-500 mb-6">You haven't made any bookings. Start by exploring available services.</p>
+                    <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Browse Services
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </section>
 
+<script>
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+    
+    // Close modal when clicking outside the modal content
+    document.addEventListener('click', function(event) {
+        const modals = document.querySelectorAll('.provider-modal');
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        });
+    });
+    
+    // Close modal when pressing Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modals = document.querySelectorAll('.provider-modal:not(.hidden)');
+            modals.forEach(modal => {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+        }
+    });
+</script>
 {% endblock %}

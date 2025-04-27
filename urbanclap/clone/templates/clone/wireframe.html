@@ -171,6 +171,72 @@
         </div>
       </div>
     </section>
+    
+      
+    <section class="py-12 bg-gray-50" id="scrollContainer">
+      <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold mb-8 text-gray-800 text-center">Testimonials</h2>
+        
+        <!-- Gradient Fades -->
+        <div class="absolute top-0 bottom-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute top-0 bottom-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
+        
+        <!-- Scroll Buttons -->
+        <button id="prevTestimonial" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-5 py-4 rounded-full z-20 shadow-lg hover:bg-gray-800 transition">
+          ‹
+        </button>
+        <button id="nextTestimonial" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-5 py-4 rounded-full z-20 shadow-lg hover:bg-gray-800 transition">
+          ›
+        </button>
+        
+        <!-- Scrollable Testimonials Container -->
+        <div id="testimonialCarousel" class="flex overflow-x-auto scrollbar-hide scroll-smooth space-x-6 w-full px-4">
+          {% if feedbacks %}
+            {% for feedback in feedbacks %}
+              <div class="testimonial-card min-w-[350px] max-w-[400px] bg-white p-6 rounded-xl shadow-md transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+                <div class="flex items-center mb-4">
+                  {% if feedback.user.profile_image %}
+                    <img src="{{ feedback.user.profile_image.url }}" 
+                         alt="User Photo" 
+                         class="rounded-full h-16 w-16 object-cover mr-4">
+                  {% else %}
+                    <div class="rounded-full h-16 w-16 bg-gray-200 flex items-center justify-center mr-4">
+                      <span class="text-xl">{{ feedback.user.username|first|upper }}</span>
+                    </div>
+                  {% endif %}
+                  <div class="text-left">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      {{ feedback.user.get_full_name|default:feedback.user.username }}
+                    </h3>
+                    <p class="text-gray-500 text-sm">
+                      {% if feedback.booking and feedback.booking.service %}
+                        {{ feedback.booking.service.name }}
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <p class="text-gray-600 mt-4 italic">"{{ feedback.feedback }}"</p>
+                <div class="text-yellow-400 mt-4 flex">
+                  {% with ''|center:feedback.rating as range %}
+                    {% for _ in range %}★{% endfor %}
+                  {% endwith %}
+                  {% with ''|center:5|slice:feedback.rating as empty_stars %}
+                    {% for _ in empty_stars %}☆{% endfor %}
+                  {% endwith %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="min-w-full text-center py-12">
+              <p class="text-gray-600 text-lg">No testimonials available yet.</p>
+              <p class="text-gray-500 mt-2">Be the first to leave feedback after your service!</p>
+            </div>
+          {% endif %}
+          
+        </div>
+      </div>
+    </section>
+   
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const scrollContainer = document.getElementById("scrollContainer");
@@ -188,6 +254,36 @@
           scrollContainer.scrollBy({ left: -cardWidth, behavior: "smooth" });
         });
       });
+       document.addEventListener("DOMContentLoaded", function () {
+    // Initialize testimonial carousel
+    const testimonialCarousel = document.getElementById("testimonialCarousel");
+    const nextTestimonialBtn = document.getElementById("nextTestimonial");
+    const prevTestimonialBtn = document.getElementById("prevTestimonial");
+
+    if (testimonialCarousel && nextTestimonialBtn && prevTestimonialBtn) {
+      const testimonialCard = testimonialCarousel.querySelector(".testimonial-card");
+      const scrollAmount = testimonialCard ? testimonialCard.offsetWidth + 24 : 350; // 24px gap
+
+      nextTestimonialBtn.addEventListener("click", () => {
+        testimonialCarousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      });
+
+      prevTestimonialBtn.addEventListener("click", () => {
+        testimonialCarousel.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      });
+
+      // Update button visibility based on scroll position
+      const updateButtonVisibility = () => {
+        const { scrollLeft, scrollWidth, clientWidth } = testimonialCarousel;
+        prevTestimonialBtn.style.opacity = scrollLeft > 10 ? '1' : '0.5';
+        nextTestimonialBtn.style.opacity = scrollLeft < scrollWidth - clientWidth - 10 ? '1' : '0.5';
+      };
+
+      testimonialCarousel.addEventListener('scroll', updateButtonVisibility);
+      window.addEventListener('resize', updateButtonVisibility);
+      updateButtonVisibility();
+    }
+  });
       
     </script>
       

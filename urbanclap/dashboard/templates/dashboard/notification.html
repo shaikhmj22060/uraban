@@ -1,65 +1,260 @@
 {% extends "comman.html" %}
-
 {% block main %}
-<!-- Notifications Section -->
-<div class="flex justify-center items-center min-h-screen">
-  <div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-lg">
-    <h1 class="text-3xl font-bold mb-6 text-center">Messages</h1>
+<!-- Notifications & Messages Dashboard -->
+<div class="bg-gray-50 min-h-screen py-8">
+  <div class="container mx-auto px-4">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="max-w-2xl mx-auto">
+        <div class="flex items-center justify-between mb-2">
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Messages</h1>
+          <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+            {% if notifications %}{{ notifications|length }}{% else %}0{% endif %} 
+            message{% if notifications|length != 1 %}s{% endif %}
+          </span>
+        </div>
+        <p class="text-gray-500">Manage KYC verification requests and system notifications</p>
+      </div>
+    </div>
 
-    {% if notifications %}
-      <ul class="space-y-4">
-        {% for notification in notifications %}
-          <li class="p-6 border rounded-lg shadow-md bg-gray-50">
-            <p class="text-lg font-semibold">{{ notification.message }}</p>
-            <p class="text-sm text-gray-500 mt-2">{{ notification.created_at|date:"F j, Y, g:i a" }}</p>
-            {% if notification.service_provider %}
-              <div class="mt-4 flex justify-center gap-4">
-                <a href="{% url 'review_kyc' notification.service_provider.id %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Review</a>
-                <a href="{% url 'approve_kyc' notification.service_provider.id %}" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Approve</a>
-                <button onclick="openModal({{ notification.service_provider.id }})" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Reject</button>
+    <!-- Message List Section -->
+    <div class="max-w-2xl mx-auto">
+      {% if notifications %}
+        <div class="space-y-4">
+          {% for notification in notifications %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition transform hover:shadow-md hover:-translate-y-1">
+              <!-- Message Header with Priority Indicator -->
+              <div class="p-5 {% if notification.service_provider %}border-l-4 border-blue-500{% endif %}">
+                <div class="flex justify-between items-start mb-3">
+                  <div class="flex items-center">
+                    {% if notification.service_provider %}
+                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 mr-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                      </div>
+                    {% else %}
+                      <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 mr-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <p class="font-semibold text-gray-800">
+                        {% if notification.service_provider %}KYC Verification Request{% else %}System Notification{% endif %}
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        {{ notification.created_at|date:"F j, Y" }} at {{ notification.created_at|date:"g:i a" }}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <!-- Time indicator with dot -->
+                  <div class="flex items-center">
+                    {% if notification.created_at|date:"Y-m-d" == today %}
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="w-2 h-2 mr-1 bg-green-500 rounded-full"></span>
+                        Today
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <!-- Message Content -->
+                <div class="mb-4">
+                  <p class="text-gray-700">{{ notification.message }}</p>
+                </div>
+                
+                <!-- Action Buttons for KYC Requests -->
+                {% if notification.service_provider %}
+                  <div class="pt-3 border-t border-gray-100">
+                    <div class="flex flex-wrap gap-2">
+                      <a href="{% url 'review_kyc' notification.service_provider.id %}" 
+                         class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        Review
+                      </a>
+                      <a href="{% url 'approve_kyc' notification.service_provider.id %}" 
+                         class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Approve
+                      </a>
+                      <button onclick="openModal({{ notification.service_provider.id }})" 
+                              class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                        <svg class="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                {% endif %}
               </div>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-gray-500 text-center">No Message found.</p>
-    {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Pagination Controls (if needed) -->
+        {% if notifications.has_other_pages %}
+          <div class="flex justify-center mt-8">
+            <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              {% if notifications.has_previous %}
+                <a href="?page={{ notifications.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Previous</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              {% endif %}
+              
+              <!-- Page numbers would go here -->
+              
+              {% if notifications.has_next %}
+                <a href="?page={{ notifications.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Next</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              {% endif %}
+            </nav>
+          </div>
+        {% endif %}
+        
+      {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-blue-500 mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">No messages yet</h3>
+          <p class="text-gray-500 max-w-sm mx-auto">When you receive new notifications or KYC verification requests, they will appear here.</p>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </div>
 
-<!-- Rejection Modal with Flowbite Integration -->
-<div id="rejectModal" tabindex="-1" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-  <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-    <h2 class="text-xl font-bold mb-4">Reject KYC</h2>
-    <form id="rejectForm" method="post" action="" class="space-y-4">
+<!-- Enhanced Rejection Modal -->
+<div id="rejectModal" tabindex="-1" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 transform transition-all opacity-0 translate-y-4" id="modalContent">
+    <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+      <h2 class="text-xl font-bold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        Reject KYC Application
+      </h2>
+      <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <form id="rejectForm" method="post" action="" class="p-5">
       {% csrf_token %}
       <input type="hidden" name="service_provider_id" id="service_provider_id">
       
-      <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Rejection</label>
-      <textarea id="reason" name="reason" rows="4" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter reason here..." required></textarea>
+      <div class="mb-5">
+        <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Reason for Rejection</label>
+        <textarea 
+          id="reason" 
+          name="reason" 
+          rows="4" 
+          class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition-colors" 
+          placeholder="Please provide a clear reason why this application is being rejected..."
+          required
+        ></textarea>
+        <p class="mt-1 text-sm text-gray-500">This message will be sent to the service provider.</p>
+      </div>
       
-      <div class="flex justify-end space-x-4">
-        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
-        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg">Submit</button>
+      <div class="flex flex-col sm:flex-row-reverse gap-3">
+        <button 
+          type="submit" 
+          class="w-full sm:w-auto px-4 py-2.5 bg-red-600 border border-transparent rounded-lg text-white font-medium shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+        >
+          Confirm Rejection
+        </button>
+        <button 
+          type="button" 
+          onclick="closeModal()" 
+          class="w-full sm:w-auto px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+        >
+          Cancel
+        </button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Flowbite and Script -->
 <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 <script>
   function openModal(serviceProviderId) {
-    document.getElementById('rejectModal').classList.remove('hidden');
+    const modal = document.getElementById('rejectModal');
+    const modalContent = document.getElementById('modalContent');
+    
     document.getElementById('service_provider_id').value = serviceProviderId;
     const form = document.getElementById('rejectForm');
     form.action = `{% url 'reject_kyc' 0 %}`.replace('0', serviceProviderId);
+    
+    // Show the modal with animation
+    modal.classList.remove('hidden');
+    
+    // Slight delay for the animation
+    setTimeout(() => {
+      modal.classList.add('opacity-100');
+      modalContent.classList.remove('opacity-0', 'translate-y-4');
+    }, 50);
+    
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+    
+    // Focus the textarea
+    setTimeout(() => {
+      document.getElementById('reason').focus();
+    }, 300);
   }
-
+  
   function closeModal() {
-    document.getElementById('rejectModal').classList.add('hidden');
-    document.getElementById('reason').value = ''; // Clear input
+    const modal = document.getElementById('rejectModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    // Animation for closing
+    modalContent.classList.add('opacity-0', 'translate-y-4');
+    
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      document.getElementById('reason').value = ''; // Clear input
+      
+      // Re-enable scrolling
+      document.body.style.overflow = '';
+    }, 300);
   }
+  
+  // Close modal when clicking outside the content
+  document.getElementById('rejectModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeModal();
+    }
+  });
+  
+  // Close modal with ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && !document.getElementById('rejectModal').classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+  
+  // Add current date for "today" tag comparison
+  const today = new Date().toISOString().split('T')[0];
 </script>
 {% endblock %}

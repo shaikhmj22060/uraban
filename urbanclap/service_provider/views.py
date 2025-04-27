@@ -6,9 +6,12 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from dashboard.models import *
 from django.contrib.auth.decorators import login_required, user_passes_test
-
+from service_provider.tasks import send_service_status_email
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.urls import reverse
+
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
 
@@ -167,18 +170,41 @@ def mark_as_read(request, notification_id):
 
 @login_required
 @user_passes_test(is_service_provider)
-def Service_request(request):   
-    service_provider = ServiceProvider.objects.get(user=request.user)
+def Service_request(request):
+    # Check if user has a service provider profile
+    try:
+        service_provider = ServiceProvider.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        messages.warning(request, "Please complete your service provider registration to access service requests.")
+        bookings = ServiceBooking.objects.filter(status='pending')
+        return render(request, 'service_provider/service_request.html', {
+            'bookings': bookings,
+            'profile_required': True
+        })
     
-    # Get bookings for the provider's category & only show pending requests
+    # Check if provider is verified
+    if not service_provider.is_verified:
+        messages.info(
+            request,
+            "Your account is under verification. You can view requests but cannot accept them yet."
+        )
+        # Show all pending requests
+        bookings = ServiceBooking.objects.filter(status='pending')
+        return render(request, 'service_provider/service_request.html', {
+            'bookings': bookings,
+            'verification_pending': True
+        })
+    
+    #If verified, show filtered bookings by category
     bookings = ServiceBooking.objects.filter(
-        # service_category=service_provider.cat,
+        
         status='pending'
     )
     
-    return render(request, 'service_provider/service_request.html', {'bookings': bookings})
-
-
+    return render(request, 'service_provider/service_request.html', {
+        'bookings': bookings,
+        'fully_verified': True
+    })
 @login_required
 @user_passes_test(is_service_provider)
 def kyc(request):
@@ -196,6 +222,8 @@ def kyc(request):
     return render(request, 'service_provider/KYC.html', context)
 
 
+@login_required
+@user_passes_test(is_service_provider)
 def accept_service(request, booking_id):
     user = request.user
     service_provider = get_object_or_404(ServiceProvider, user=user)
@@ -210,7 +238,6 @@ def accept_service(request, booking_id):
         messages.warning(request, "This service has already been accepted or assigned.")
         return redirect('s_booking_request')
 
-    # Optional: check category match if needed
     if booking.service.category != service_provider.cat:
         messages.error(request, "You cannot accept this service. It does not match your category.")
         return redirect('s_booking_request')
@@ -219,5 +246,61 @@ def accept_service(request, booking_id):
     booking.status = "accepted"
     booking.save()
 
+    # Send email to client
+    subject = "Service Request Accepted"
+    message = (
+        f"Hi {booking.client.username},\n\n"
+        f"Your request for '{booking.service.name}' has been accepted by {service_provider.user}.\n"
+        f"Service Date: {booking.service_date}\nTime: {booking.service_time}\n\n"
+        "Thank you for using our service!"
+    )
+    print(message)
+    send_service_status_email.delay(subject, message, booking.client.email)
+
     messages.success(request, "You have successfully accepted the service.")
+    
     return redirect('s_booking_request')
+
+@login_required
+@user_passes_test(is_service_provider)
+def accepted_services(request):
+    
+    # Assuming your Booking model has a foreign key to the service provider
+    # and a status field to filter accepted bookings
+    bookings = ServiceBooking.objects.filter(service_provider=request.user,  status__in=['accepted', 'assigned'])
+
+
+    return render(request, 'service_provider/accepted_Service.html', { 'bookings': bookings})
+
+@login_required
+@user_passes_test(is_service_provider)
+@user_passes_test(is_service_provider)
+def mark_service_completed(request, booking_id):
+    booking = get_object_or_404(ServiceBooking, id=booking_id, service_provider=request.user)
+
+    if booking.status not in ['accepted', 'assigned']:
+        messages.error(request, f'Service must be in accepted or assigned state. Current status: {booking.status}')
+        return redirect('accepted_services')  # Replace with your actual redirect view
+
+    booking.status = 'completed'
+    booking.save()
+
+    # Send email to client
+    feedback_url = f"http://localhost:8000{reverse('feedback_page', args=[booking.id])}"
+
+    subject = f"Service '{booking.service.name}' Completed — Share Your Feedback"
+
+    message = (
+        f"Hi {booking.client.name},\n\n"
+        f"The service '{booking.service.name}' you booked has been marked as completed by {request.user.username}.\n\n"
+        f"We hope you're satisfied with the service.\n\n"
+        f"👉 Please take a moment to share your experience: {feedback_url}\n\n"
+        f"Your feedback helps us improve and serve you better!\n\n"
+        f"Thank you for choosing us!\n\n"
+        f"— The Team"
+    )
+
+    send_service_status_email.delay(subject, message, booking.client.email)
+
+    messages.success(request, 'Service marked as completed successfully!')
+    return redirect('accepted_services')

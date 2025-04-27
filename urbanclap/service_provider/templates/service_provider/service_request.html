@@ -1,42 +1,178 @@
 {% extends "service_dashboard.html" %}
 {% block s_provider %}
 <div class="container mx-auto p-6">
+    <!-- Messages section with enhanced colors -->
+    {% if messages %}
+    <div id="message-container" class="mb-6">
+        {% for message in messages %}
+        <div class="p-4 mb-3 rounded-lg message-alert animate-fade-in {% if message.tags == 'error' %}bg-red-100 text-red-900 border-l-4 border-red-600 shadow-md shadow-red-200{% elif message.tags == 'success' %}bg-emerald-100 text-emerald-900 border-l-4 border-emerald-500 shadow-md shadow-emerald-200{% elif message.tags == 'warning' %}bg-amber-100 text-amber-900 border-l-4 border-amber-500 shadow-md shadow-amber-200{% else %}bg-blue-100 text-blue-900 border-l-4 border-blue-500 shadow-md shadow-blue-200{% endif %}">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    {% if message.tags == 'error' %}
+                    <svg class="w-6 h-6 mr-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                    {% elif message.tags == 'success' %}
+                    <svg class="w-6 h-6 mr-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    {% elif message.tags == 'warning' %}
+                    <svg class="w-6 h-6 mr-3 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    {% else %}
+                    <svg class="w-6 h-6 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    {% endif %}
+                    <p class="font-semibold">{{ message }}</p>
+                </div>
+                <button onclick="dismissMessage(this.parentNode.parentNode)" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Rest of the template remains unchanged -->
     <h2 class="text-3xl font-bold mb-6">Service Requests</h2>
 
+    <!-- Status Cards -->
+    {% if profile_required %}
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+                <h3 class="font-bold text-lg mb-1">Complete Your Profile</h3>
+                <p class="mb-3">You need to register as a service provider to accept requests.</p>
+                <a href="{% url 'kyc' %}" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
+                    Complete Registration
+                </a>
+            </div>
+        </div>
+    </div>
+    {% elif verification_pending %}
+    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-lg">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+                <h3 class="font-bold text-lg">Verification Pending</h3>
+                <p>Your account is under review. You can view requests but cannot accept them yet.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Requests Table -->
     {% if bookings %}
-        <div class="bg-white p-6 shadow-lg rounded-lg">
+    <div class="bg-white p-6 shadow-lg rounded-lg {% if not fully_verified %}opacity-90{% endif %}">
+        <div class="overflow-x-auto">
             <table class="w-full border-collapse">
                 <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-3 text-left">Service</th>
-                        <th class="p-3 text-left">Client</th>
-                        <th class="p-3 text-left">Date</th>
-                        <th class="p-3 text-left">Time</th>
-                        <th class="p-3 text-left">Actions</th>
+                    <tr class="bg-gray-100 border-b border-gray-200">
+                        <th class="p-4 text-left font-semibold text-gray-700">Service</th>
+                        <th class="p-4 text-left font-semibold text-gray-700">Client</th>
+                        <th class="p-4 text-left font-semibold text-gray-700">Date</th>
+                        <th class="p-4 text-left font-semibold text-gray-700">Time</th>
+                        <th class="p-4 text-left font-semibold text-gray-700">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr class="border-b">
-                        <td class="p-3">{{ booking.service.name }}</td>
-                        <td class="p-3">{{ booking.client.username }}</td>
-                        <td class="p-3">{{ booking.service_date }}</td>
-                        <td class="p-3">{{ booking.service_time }}</td>
-                        <td class="p-3">
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4">{{ booking.service.name }}</td>
+                        <td class="p-4">{{ booking.client.username }}</td>
+                        <td class="p-4">{{ booking.service_date }}</td>
+                        <td class="p-4">{{ booking.service_time }}</td>
+                        <td class="p-4">
+                            {% if fully_verified %}
                             <form method="POST" action="{% url 'accept_service' booking.id %}">
                                 {% csrf_token %}
-                                <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                                     Accept
                                 </button>
                             </form>
+                            {% else %}
+                            <button class="bg-gray-300 text-gray-600 px-4 py-2 rounded cursor-not-allowed" disabled>
+                                {% if profile_required %}
+                                Complete Registration
+                                {% else %}
+                                Verification Pending
+                                {% endif %}
+                            </button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+    </div>
     {% else %}
-        <p class="text-center text-gray-500">No service requests available.</p>
+    <div class="bg-white p-10 shadow-lg rounded-lg text-center">
+        <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <p class="mt-4 text-lg text-gray-500">No service requests available at this time.</p>
+    </div>
     {% endif %}
 </div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in-out forwards;
+    }
+    
+    /* Enhanced message styling */
+    .message-alert {
+        transition: opacity 0.3s ease-out;
+    }
+    
+    /* Pulse animation for error messages */
+    @keyframes gentle-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    
+    .message-alert[class*="bg-red-"] {
+        animation: gentle-pulse 2s infinite;
+    }
+</style>
+
+<script>
+    // Auto-dismiss messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.message-alert');
+        messages.forEach((message, index) => {
+            // Keep error messages visible longer
+            const isError = message.classList.contains('bg-red-100');
+            const dismissTime = isError ? 8000 : 5000;
+            
+            setTimeout(() => {
+                if (message && message.parentNode) {
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 300);
+                }
+            }, dismissTime + (index * 500));
+        });
+    });
+
+    function dismissMessage(element) {
+        element.style.opacity = '0';
+        setTimeout(() => element.remove(), 300);
+    }
+</script>
 {% endblock %}

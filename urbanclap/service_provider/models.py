@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ValidationError
-
+from decimal import Decimal
 from django.conf import settings
 from django.utils.timezone import now
 
@@ -94,3 +94,22 @@ class ServiceBooking(models.Model):
 
     def __str__(self):
         return f"Booking {self.id} - {self.service.name} - {self.status}"
+    
+
+
+class ServiceProviderEarning(models.Model):
+    provider = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    booking = models.OneToOneField('service_provider.ServiceBooking', on_delete=models.CASCADE)
+    payment = models.OneToOneField('dashboard.Payment', on_delete=models.CASCADE)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    commission = models.DecimalField(max_digits=10, decimal_places=2)
+    provider_earning = models.DecimalField(max_digits=10, decimal_places=2)
+    payout_status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('paid', 'Paid')
+    ], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    payout_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.provider.name} - Booking {self.booking.id} - {self.payout_status}"
